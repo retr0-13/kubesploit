@@ -1,0 +1,27 @@
+{
+  "base": {
+    "name": "Container Breakout via mounting",
+    "type": "standard",
+    "author": ["Eviatar Gerzi (@g3rzi)"],
+    "credits": [],
+    "path": ["linux", "go", "mountContainerBreakout.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": true,
+    "GoInterpreterProgress": false,
+    "notes": "",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "Device", "value": "", "required": false, "flag": "", "description": "Use known device name (i.e \"/dev/sda1\", \"/dev/xvda1\")"},
+      {"name": "UseBruteforce", "value": "false", "required": false, "flag": "", "description": "Use the \"true\" value to use brute force on known devices: \"/dev/sda1\" and \"/dev/xvda1\")"}
+    ],
+    "description": "Break out from the container to the host using mounting. It will create a mounted host folder named /mnt<number>",
+    "commands": [
+      "data/modules/go/mountBreakout/main.go",
+      "mainfunc(\"{{Device}}\", \"{{UseBruteforce}}\")"
+    ]
+  }
+}

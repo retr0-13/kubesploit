@@ -1,0 +1,27 @@
+{
+  "base": {
+    "name": "kubeletctl",
+    "type": "standard",
+    "author": ["Eviatar Gerzi (@g3rzi)"],
+    "credits": [],
+    "path": ["linux", "go", "kubeletAttack.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": true,
+    "GoInterpreterProgress": false,
+    "notes": "Commands are run with /bin/bash -c . Use quotes if you want to run multiple commands or shell features such as redirection or pipeline",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "Url", "value": "https://<k8s_worker>:10250", "required": true, "flag": "", "description": "The address of the node with the open kubelet API"},
+      {"name": "Command", "value": "pods", "required": true, "flag": "", "description": "There are number of options:     1. run                         2. rce                         3. pods                        4. token                    *See module description on how to use them with switches and examples"}
+    ],
+    "description": "\nUrl - The address of the node with the open kubelet API\nCommand - there are number of options:\n\t1. run - run command on container\n\t   examples:\n\t     1.a. run \\\"whoami\\\" -n default -c alpine -p alpine\n\t     1.b. run -a\n\t     1.c. run -as\n\t2. rce - search for containers with RCE\n\t3. pods \n\t     3.a. pods -r\n\t4. token\n\n\tExamples:\n\t  run \\\"whoami\\\" -n default -c alpine -p alpine\n\t  run -a\n\t  run -as\n\t  token\n\t  pods\n\t  rce\n\n\tswitches:\n\t  \"-n\"  - namespace\n\t  \"-p\"  - pods name\n\t  \"-c\"  - container name\n\t  \"-a\"  - run command on all pods synchronically\n\t  \"-as\" - run command on all pods asynchronic\n\t  \"-r\" - print in raw (use with pods commands)",
+    "commands": [
+      "data/modules/go/kubelet/main.go",
+      "mainfunc(\"{{Url}}\", \"{{Command}}\")"
+    ]
+  }
+}

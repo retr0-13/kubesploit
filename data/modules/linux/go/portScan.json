@@ -1,0 +1,26 @@
+{
+  "base": {
+    "name": "PortScan",
+    "type": "standard",
+    "author": ["Eviatar Gerzi (@g3rzi)"],
+    "credits": [],
+    "path": ["linux", "go", "portScan.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": false,
+    "GoInterpreterProgress": true,
+    "notes": "",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "Urls", "value": "example.com", "required": true, "flag": "", "description": "To scan multiple addresses use \";\" for separation.\nExample: \"addr1;addr2;addr3\""}
+    ],
+    "description": "Port scanning",
+    "commands": [
+      "data/modules/go/scan/portScan/main.go",
+      "mainfunc(\"{{Urls}}\")"
+    ]
+  }
+}

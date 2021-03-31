@@ -1,19 +1,20 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2020  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package agents
 
@@ -29,9 +30,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	// Merlin
-	"github.com/Ne0nd0g/merlin/pkg/agents"
-	"github.com/Ne0nd0g/merlin/pkg/api/messages"
-	"github.com/Ne0nd0g/merlin/pkg/modules/shellcode"
+	"kubesploit/pkg/agents"
+	"kubesploit/pkg/api/messages"
+	"kubesploit/pkg/modules/shellcode"
 )
 
 // CD is used to change the agent's current working directory
@@ -70,6 +71,36 @@ func CMD(agentID uuid.UUID, Args []string) messages.UserMessage {
 	}
 	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
 }
+
+// CMDGO is used to send a command to the agent to run a command or execute a program
+// Args[0] = "cmdgo"
+// Args[1:] = program and arguments to be executed on the host OS of the running agent
+func CMDGO(agentID uuid.UUID, Args []string) messages.UserMessage {
+	if len(Args) > 0 {
+		job, err := agents.AddJob(agentID, "cmdgo", Args)
+		if err != nil {
+			return messages.ErrorMessage(err.Error())
+		}
+		return messages.JobMessage(agentID, job)
+	}
+	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
+}
+
+
+// CMDGOPROG is used to send a command to the agent to run a command or execute a program
+// Args[0] = "cmd"
+// Args[1:] = program and arguments to be executed on the host OS of the running agent
+func CMDGOPROG(agentID uuid.UUID, Args []string) messages.UserMessage {
+	if len(Args) > 0 {
+		job, err := agents.AddJob(agentID, "cmdgoprogress", Args)
+		if err != nil {
+			return messages.ErrorMessage(err.Error())
+		}
+		return messages.JobMessage(agentID, job)
+	}
+	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
+}
+
 
 // Download is used to download the file through the corresponding agent from the provided input file path
 // Args[0] = download

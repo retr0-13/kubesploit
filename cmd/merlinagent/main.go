@@ -1,19 +1,20 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2019  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -21,6 +22,9 @@ import (
 	// Standard
 	"flag"
 	"fmt"
+	merlin "kubesploit/pkg"
+	"kubesploit/pkg/agent"
+
 	"os"
 	"time"
 
@@ -28,18 +32,19 @@ import (
 	"github.com/fatih/color"
 
 	// Merlin
-	"github.com/Ne0nd0g/merlin/pkg"
-	"github.com/Ne0nd0g/merlin/pkg/agent"
+	//"kubesploit/pkg"
 )
 
 // GLOBAL VARIABLES
+
 var url = "https://127.0.0.1:443"
 var protocol = "h2"
 var build = "nonRelease"
-var psk = "merlin"
+var psk = "kubesploit"
 var proxy = ""
 var host = ""
 var ja3 = ""
+
 
 func main() {
 	verbose := flag.Bool("v", false, "Enable verbose output")
@@ -51,13 +56,14 @@ func main() {
 	flag.StringVar(&proxy, "proxy", proxy, "Hardcoded proxy to use for http/1.1 traffic only that will override host configuration")
 	flag.StringVar(&host, "host", host, "HTTP Host header")
 	flag.StringVar(&ja3, "ja3", ja3, "JA3 signature string (not the MD5 hash). Overrides -proto flag")
-	sleep := flag.Duration("sleep", 30000*time.Millisecond, "Time for agent to sleep")
+	sleep := flag.Duration("sleep", 10000*time.Millisecond, "Time for agent to sleep")
 	flag.Usage = usage
 	flag.Parse()
 
 	if *version {
-		color.Blue(fmt.Sprintf("Merlin Agent Version: %s", merlin.Version))
-		color.Blue(fmt.Sprintf("Merlin Agent Build: %s", build))
+		color.Blue(fmt.Sprintf("Kubesploit Agent Version: %s", merlin.Version))
+		color.Blue(fmt.Sprintf("Merlin Agent Version: %s", merlin.MerlinVersion))
+		color.Blue(fmt.Sprintf("Kubesploit Agent Build: %s", build))
 		os.Exit(0)
 	}
 
@@ -81,7 +87,7 @@ func main() {
 
 // usage prints command line options
 func usage() {
-	fmt.Printf("Merlin Agent\r\n")
+	fmt.Printf("Kubesploit Agent\r\n")
 	flag.PrintDefaults()
 	os.Exit(0)
 }

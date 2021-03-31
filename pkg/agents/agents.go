@@ -1,19 +1,20 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2019  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package agents
 
@@ -43,10 +44,10 @@ import (
 	"go.dedis.ch/kyber/v3"
 
 	// Merlin
-	messageAPI "github.com/Ne0nd0g/merlin/pkg/api/messages"
-	"github.com/Ne0nd0g/merlin/pkg/core"
-	"github.com/Ne0nd0g/merlin/pkg/logging"
-	"github.com/Ne0nd0g/merlin/pkg/messages"
+	messageAPI "kubesploit/pkg/api/messages"
+	"kubesploit/pkg/core"
+	"kubesploit/pkg/logging"
+	"kubesploit/pkg/messages"
 )
 
 // Global Variables
@@ -649,6 +650,29 @@ func GetMessageForJob(agentID uuid.UUID, job Job) (messages.Base, error) {
 		if len(job.Args) > 1 {
 			p.Args = strings.Join(job.Args[1:], " ")
 		}
+		m.Payload = p
+	case "cmdgo":
+
+		m.Type = "CmdGoPayload"
+		p := messages.CmdPayload{
+			Command: job.Args[0],
+			Job:     job.ID,
+		}
+		//if len(job.Args) > 1 {
+		//	p.Args = strings.Join(job.Args[1:], " ")
+		//}
+		p.ArgsArray = job.Args[1:]
+		m.Payload = p
+	case "cmdgoprogress":
+		m.Type = "CmdGoProgressPayload"
+		p := messages.CmdPayload{
+			Command: job.Args[0],
+			Job:     job.ID,
+		}
+		//if len(job.Args) > 1 {
+		//	p.Args = strings.Join(job.Args[1:], " ")
+		//}
+		p.ArgsArray = job.Args[1:]
 		m.Payload = p
 	case "shellcode":
 		m.Type = "Shellcode"

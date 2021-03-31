@@ -1,4 +1,5 @@
-FROM golang:stretch
+FROM golang:1.14.15-alpine3.13 as builder
+
 
 # Build the Docker image first
 #  > sudo docker build -t merlin .
@@ -6,15 +7,17 @@ FROM golang:stretch
 # To start the Merlin Server, run
 #  > sudo docker run -it -p 443:443 --mount type=bind,src=/tmp,dst=/go/src/github.com/Ne0nd0g/merlin/data merlin
 
-RUN apt-get update && apt-get install -y git make vim gcc-mingw-w64
-WORKDIR $GOPATH/src/github.com/Ne0nd0g
-RUN git clone https://github.com/Ne0nd0g/merlin
 
-WORKDIR $GOPATH/src/github.com/Ne0nd0g/merlin
-RUN go mod download
-RUN make generate-agents
+RUN mkdir /src
+ADD . /src
+WORKDIR /src
 
-VOLUME ["data"]
-EXPOSE 443
 
-CMD ["go", "run", "cmd/merlinserver/main.go"]
+RUN apk update && apk upgrade && apk add bash && apk add vim && go get github.com/mitchellh/gox
+# RUN gox -ldflags "-s -w" -osarch linux/386 -output "merlin"
+RUN go build cmd/merlinserver/main.go
+#FROM alpine:latest
+#COPY --from=builder /src/merlin /app/
+#WORKDIR /app
+
+#ENTRYPOINT ["bash -c /src/merlin"]

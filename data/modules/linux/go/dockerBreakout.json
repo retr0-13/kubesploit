@@ -1,0 +1,27 @@
+{
+  "base": {
+    "name": "Container Breakout via docker.sock",
+    "type": "standard",
+    "author": ["Eviatar Gerzi (@g3rzi)"],
+    "credits": [],
+    "path": ["linux", "go", "dockerBreakout.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": true,
+    "GoInterpreterProgress": false,
+    "notes": "",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "IP", "value": "127.0.0.1", "required": false, "flag": "", "description": "Remote IP to connect"},
+      {"name": "Port", "value": "6666", "required": false, "flag": "", "description": "Remote port to connect"}
+    ],
+    "description": "Services scanning (/data/modules/go/services/mainfunc.go)",
+    "commands": [
+      "data/modules/go/dockerSockBreakout/main.go",
+      "mainfunc(\"{{IP}}\", \"{{Port}}\")"
+    ]
+  }
+}

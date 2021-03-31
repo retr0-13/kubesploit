@@ -1,19 +1,20 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2019  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package modules
 
@@ -36,32 +37,34 @@ import (
 	"github.com/satori/go.uuid"
 
 	// Merlin
-	"github.com/Ne0nd0g/merlin/pkg/agents"
-	"github.com/Ne0nd0g/merlin/pkg/core"
-	"github.com/Ne0nd0g/merlin/pkg/modules/minidump"
-	"github.com/Ne0nd0g/merlin/pkg/modules/shellcode"
-	"github.com/Ne0nd0g/merlin/pkg/modules/srdi"
+	"kubesploit/pkg/agents"
+	"kubesploit/pkg/core"
+	"kubesploit/pkg/modules/minidump"
+	"kubesploit/pkg/modules/shellcode"
+	"kubesploit/pkg/modules/srdi"
 )
 
 // Module is a structure containing the base information or template for modules
 type Module struct {
-	Agent        uuid.UUID   // The Agent that will later be associated with this module prior to execution
-	Name         string      `json:"name"`                 // Name of the module
-	Type         string      `json:"type"`                 // Type of module (i.e. standard or extended)
-	Author       []string    `json:"author"`               // A list of module authors
-	Credits      []string    `json:"credits"`              // A list of people to credit for underlying tool or techniques
-	Path         []string    `json:"path"`                 // Path to the module (i.e. data/modules/powershell/powerview)
-	Platform     string      `json:"platform"`             // Platform the module can run on (i.e. Windows, Linux, Darwin, or ALL)
-	Arch         string      `json:"arch"`                 // The Architecture the module can run on (i.e. x86, x64, MIPS, ARM, or ALL)
-	Lang         string      `json:"lang"`                 // What language does the module execute in (i.e. PowerShell, Python, or Perl)
-	Priv         bool        `json:"privilege"`            // Does this module required a privileged level account like root or SYSTEM?
-	Description  string      `json:"description"`          // A description of what the module does
-	Notes        string      `json:"notes"`                // Additional information or notes about the module
-	Commands     []string    `json:"commands"`             // A list of commands to be run on the agent
-	SourceRemote string      `json:"remote"`               // Online or remote source code for a module
-	SourceLocal  []string    `json:"local"`                // The local file path to the script or payload
-	Options      []Option    `json:"options"`              // A list of configurable options/arguments for the module
-	Powershell   interface{} `json:"powershell,omitempty"` // An option json object containing commands and configuration items specific to PowerShell
+	Agent        uuid.UUID      // The Agent that will later be associated with this module prior to execution
+	Name         string         `json:"name"`                 // Name of the module
+	Type         string         `json:"type"`                 // Type of module (i.e. standard or extended)
+	Author       []string       `json:"author"`               // A list of module authors
+	Credits      []string       `json:"credits"`              // A list of people to credit for underlying tool or techniques
+	Path         []string       `json:"path"`                 // Path to the module (i.e. data/modules/powershell/powerview)
+	Platform     string         `json:"platform"`             // Platform the module can run on (i.e. Windows, Linux, Darwin, or ALL)
+	Arch         string         `json:"arch"`                 // The Architecture the module can run on (i.e. x86, x64, MIPS, ARM, or ALL)
+	Lang         string         `json:"lang"`                 // What language does the module execute in (i.e. PowerShell, Python, or Perl)
+	Priv         bool           `json:"privilege"`            // Does this module required a privileged level account like root or SYSTEM?
+	Description  string         `json:"description"`          // A description of what the module does
+	Notes        string         `json:"notes"`                // Additional information or notes about the module
+	Commands     []string       `json:"commands"`             // A list of commands to be run on the agent
+	SourceRemote string         `json:"remote"`               // Online or remote source code for a module
+	SourceLocal  []string       `json:"local"`                // The local file path to the script or payload
+	Options      []Option       `json:"options"`              // A list of configurable options/arguments for the module
+	Powershell   interface{}    `json:"powershell,omitempty"` // An option json object containing commands and configuration items specific to PowerShell
+	GoInterpreter bool		    `json:"GoInterpreter"`       // Notification for Go code for the agent to use yaegi (Go interpreter)
+	GoInterpreterProgress bool  `json:"GoInterpreterProgress"`       // Notification for Go code that print while still in progress for the agent to use yaegi (Go interpreter)
 }
 
 // Option is a structure containing the keys for the object

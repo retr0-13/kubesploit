@@ -1,0 +1,26 @@
+{
+  "base": {
+    "name": "CVE-2019-5736",
+    "type": "standard",
+    "author": ["Nick Frichette (@Frichette_n), integrated by Eviatar Gerzi (@g3rzi)"],
+    "credits": ["Dominic White (@singe), Michael Kruger (@_cablethief), Fernando Aulicino (@FeexD)"],
+    "path": ["linux", "go", "cve2019_5736.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": false,
+    "GoInterpreterProgress": true,
+    "notes": "",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "Payload", "value": "cat /etc/shadow > /tmp/shadow && chmod 777 /tmp/shadow", "required": true, "flag": "", "description": "Payload to run on the host machine"}
+    ],
+    "description": "Exploit for the runc vulnerability (CVE-2019-5736) that allows attackers to overwrite the host runc binary (and consequently obtain host root access) by leveraging the ability to execute a command as root within one of these types of containers: \n\t(1) a new container with an attacker-controlled image \n\t(2) an existing container, to which the attacker previously had write access, that can be attached with docker exec. \nThis occurs because of file-descriptor mishandling, related to /proc/self/exe",
+    "commands": [
+      "data/modules/go/CVE-2019-5736/main.go",
+      "mainfunc(\"{{Payload}}\")"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "base": {
+    "name": "K8sServicesScan",
+    "type": "standard",
+    "author": ["Eviatar Gerzi (@g3rzi)"],
+    "credits": ["Nir Chako (@C_h4ck_0"],
+    "path": ["linux", "go", "servicesScan.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": false,
+    "GoInterpreterProgress": true,
+    "notes": "",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "CIDR", "value": "10.96.0.0/16", "required": true, "flag": "", "description": "CIDR of the services (default: 10.96.0.0/16)"},
+      {"name": "Threads", "value": "100", "required": true, "flag": "", "description": "Number of threads (default: 100)"},
+      {"name": "Interval", "value": "10000", "required": false, "flag": "", "description": "Print update every N addresses (default: 10000)"}
+    ],
+    "description": "Services scanning (/data/modules/go/services/mainfunc.go)",
+    "commands": [
+      "data/modules/go/scan/services/main.go",
+      "mainfunc(\"{{CIDR}}\", \"{{Threads}}\", \"{{Interval}}\")"
+    ]
+  }
+}

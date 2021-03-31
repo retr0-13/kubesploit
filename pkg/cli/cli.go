@@ -1,26 +1,29 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2019  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package cli
 
 import (
 	"bufio"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -35,17 +38,17 @@ import (
 	"github.com/satori/go.uuid"
 
 	// Merlin
-	"github.com/Ne0nd0g/merlin/pkg"
-	"github.com/Ne0nd0g/merlin/pkg/agents"
-	agentAPI "github.com/Ne0nd0g/merlin/pkg/api/agents"
-	listenerAPI "github.com/Ne0nd0g/merlin/pkg/api/listeners"
-	"github.com/Ne0nd0g/merlin/pkg/api/messages"
-	moduleAPI "github.com/Ne0nd0g/merlin/pkg/api/modules"
-	"github.com/Ne0nd0g/merlin/pkg/banner"
-	"github.com/Ne0nd0g/merlin/pkg/core"
-	"github.com/Ne0nd0g/merlin/pkg/logging"
-	"github.com/Ne0nd0g/merlin/pkg/modules"
-	"github.com/Ne0nd0g/merlin/pkg/servers"
+	"kubesploit/pkg"
+	"kubesploit/pkg/agents"
+	agentAPI "kubesploit/pkg/api/agents"
+	listenerAPI "kubesploit/pkg/api/listeners"
+	"kubesploit/pkg/api/messages"
+	moduleAPI "kubesploit/pkg/api/modules"
+	"kubesploit/pkg/banner"
+	"kubesploit/pkg/core"
+	"kubesploit/pkg/logging"
+	"kubesploit/pkg/modules"
+	"kubesploit/pkg/servers"
 )
 
 // Global Variables
@@ -61,6 +64,113 @@ var shellMenuContext = "main"
 var MessageChannel = make(chan messages.UserMessage)
 var clientID = uuid.NewV4()
 
+type YamListener struct {
+	Name string `yaml:"Name"`
+	Protocol string `yaml:"Protocol"`
+	Interface string `yaml:"Interface"`
+	Port string `yaml:"Port"`
+}
+
+type YamlConfig struct {
+	AutoStart string `yaml:"AutoStart"`
+	AutoSetAllAgents string `yaml:"AutoSetAllAgents"`
+	Listeners []YamListener `yaml:"Listeners"`
+}
+var GlobalYamlConfig YamlConfig
+
+const DEFAULT_YAML_FILE = "./config.yaml"
+
+func initializeYamlFile() error {
+	yamlFile := DEFAULT_YAML_FILE
+
+	yamlFileBytes, err := ioutil.ReadFile(yamlFile)
+	//fmt.Printf("[*] Read YAML file\n")
+	m := fmt.Sprintf("Reading config YAML file")
+	um := messages.UserMessage{
+		Level:   messages.Success,
+		Time:    time.Now().UTC(),
+		Message: m,
+		Error:   false,
+	}
+
+	MessageChannel <- um
+
+	if err != nil {
+		//fmt.Printf("[*] Failed to read YAML file: %s\n", err)
+		m := fmt.Sprintf("Failed to read YAML file: %s\n", err)
+		messages.SendBroadcastMessage(messages.UserMessage{
+			Level:   messages.Note,
+			Message: m,
+			Time:    time.Now().UTC(),
+			Error:   false,
+		})
+
+	} else {
+		//fmt.Printf("[*] Parsing YAML file\n")
+		m := fmt.Sprintf("Parsing config YAML file")
+		um := messages.UserMessage{
+			Level:   messages.Success,
+			Time:    time.Now().UTC(),
+			Message: m,
+			Error:   false,
+		}
+
+		MessageChannel <- um
+		err = yaml.Unmarshal(yamlFileBytes, &GlobalYamlConfig)
+		if err != nil {
+			//fmt.Printf("[*] Failed to parse YAML file: %s\n", err)
+			m := fmt.Sprintf("Failed to parse YAML file: %s\n", err)
+			messages.SendBroadcastMessage(messages.UserMessage{
+				Level:   messages.Note,
+				Message: m,
+				Time:    time.Now().UTC(),
+				Error:   false,
+			})
+		}
+	}
+
+	return err
+}
+
+func loadYamlConfigFile() {
+	err := initializeYamlFile()
+	if err == nil {
+		if strings.ToLower(GlobalYamlConfig.AutoStart) == "true" {
+			for _, yamlListener := range GlobalYamlConfig.Listeners{
+				shellListenerOptions = listenerAPI.GetListenerOptions(yamlListener.Protocol)
+				shellListenerOptions["Protocol"] = yamlListener.Protocol
+				shellListenerOptions["Interface"] = yamlListener.Interface
+				shellListenerOptions["Port"] = yamlListener.Port
+				shellListenerOptions["Name"] = yamlListener.Name
+
+				um, id := listenerAPI.NewListener(shellListenerOptions)
+				MessageChannel <- um
+				if um.Error {
+					return
+				}
+
+				if id == uuid.Nil {
+					MessageChannel <- messages.UserMessage{
+						Level:   messages.Warn,
+						Message: "a nil Listener UUID was returned",
+						Time:    time.Time{},
+						Error:   true,
+					}
+					return
+				}
+
+				shellListener = listener{id: id, name: shellListenerOptions["Name"]}
+				startMessage := listenerAPI.Start(shellListener.name)
+				MessageChannel <- startMessage
+				um, _ = listenerAPI.GetListenerConfiguredOptions(shellListener.id)
+				if um.Error {
+					MessageChannel <- um
+				}
+			}
+		}
+	}
+}
+
 // Shell is the exported function to start the command line interface
 func Shell() {
 
@@ -71,7 +181,7 @@ func Shell() {
 	getUserMessages()
 
 	p, err := readline.NewEx(&readline.Config{
-		Prompt:              "\033[31mMerlin»\033[0m ",
+		Prompt:              "\033[31mkubesploit»\033[0m ",
 		HistoryFile:         "/tmp/readline.tmp",
 		AutoComplete:        shellCompleter,
 		InterruptPrompt:     "^C",
@@ -97,6 +207,7 @@ func Shell() {
 		}
 	}()
 
+	loadYamlConfigFile()
 	log.SetOutput(prompt.Stderr())
 
 	for {
@@ -130,9 +241,9 @@ func Shell() {
 					}
 				case "banner":
 					m := "\n"
-					m += color.BlueString(banner.MerlinBanner1)
-					m += color.BlueString("\r\n\t\t   Version: %s", merlin.Version)
-					m += color.BlueString("\r\n\t\t   Build: %s\n", merlin.Build)
+					m += color.BlueString(banner.KubesploitBanner)
+					m += color.BlueString("\r\n\t\t   Version: %s", kubesploitVersion.Version)
+					m += color.BlueString("\r\n\t\t   Build: %s\n", kubesploitVersion.Build)
 					MessageChannel <- messages.UserMessage{
 						Level:   messages.Plain,
 						Message: m,
@@ -161,7 +272,7 @@ func Shell() {
 				case "listeners":
 					shellMenuContext = "listenersmain"
 					prompt.Config.AutoComplete = getCompleter("listenersmain")
-					prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m]»\033[0m ")
+					prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m]»\033[0m ")
 				case "remove":
 					if len(cmd) > 1 {
 						i := []string{"remove"}
@@ -216,7 +327,7 @@ func Shell() {
 				case "version":
 					MessageChannel <- messages.UserMessage{
 						Level:   messages.Plain,
-						Message: color.BlueString("Merlin version: %s\n", merlin.Version),
+						Message: color.BlueString("Merlin version: %s\n", kubesploitVersion.Version),
 						Time:    time.Now().UTC(),
 						Error:   false,
 					}
@@ -511,34 +622,44 @@ func menuAgent(cmd []string) {
 		}
 	case "remove":
 		if len(cmd) > 1 {
-			i, errUUID := uuid.FromString(cmd[1])
-			if errUUID != nil {
-				MessageChannel <- messages.UserMessage{
-					Level:   messages.Warn,
-					Message: fmt.Sprintf("There was an error interacting with agent %s", cmd[1]),
-					Time:    time.Now().UTC(),
-					Error:   true,
+			if cmd[1] == "all" {
+				for _, v := range agents.Agents {
+					removeAgentByUUID(v.ID.String(), v.ID)
 				}
 			} else {
-				errRemove := agents.RemoveAgent(i)
-				if errRemove != nil {
+				i, errUUID := uuid.FromString(cmd[1])
+				if errUUID != nil {
 					MessageChannel <- messages.UserMessage{
 						Level:   messages.Warn,
-						Message: errRemove.Error(),
+						Message: fmt.Sprintf("There was an error interacting with agent %s", cmd[1]),
 						Time:    time.Now().UTC(),
 						Error:   true,
 					}
 				} else {
-					m := fmt.Sprintf("Agent %s was removed from the server at %s",
-						cmd[1], time.Now().UTC().Format(time.RFC3339))
-					MessageChannel <- messages.UserMessage{
-						Level:   messages.Info,
-						Message: m,
-						Time:    time.Now().UTC(),
-						Error:   false,
-					}
+					removeAgentByUUID(cmd[1], i)
 				}
 			}
+		}
+	}
+}
+
+func removeAgentByUUID(agentIDStr string, agentID uuid.UUID){
+	errRemove := agents.RemoveAgent(agentID)
+	if errRemove != nil {
+		MessageChannel <- messages.UserMessage{
+			Level:   messages.Warn,
+			Message: errRemove.Error(),
+			Time:    time.Now().UTC(),
+			Error:   true,
+		}
+	} else {
+		m := fmt.Sprintf("Agent %s was removed from the server at %s",
+			agentIDStr, time.Now().UTC().Format(time.RFC3339))
+		MessageChannel <- messages.UserMessage{
+			Level:   messages.Info,
+			Message: m,
+			Time:    time.Now().UTC(),
+			Error:   false,
 		}
 	}
 }
@@ -548,7 +669,7 @@ func menuSetAgent(agentID uuid.UUID) {
 		if agentID == agents.Agents[k].ID {
 			shellAgent = agentID
 			prompt.Config.AutoComplete = getCompleter("agent")
-			prompt.SetPrompt("\033[31mMerlin[\033[32magent\033[31m][\033[33m" + shellAgent.String() + "\033[31m]»\033[0m ")
+			prompt.SetPrompt("\033[31mkubesploit[\033[32magent\033[31m][\033[33m" + shellAgent.String() + "\033[31m]»\033[0m ")
 			shellMenuContext = "agent"
 		}
 	}
@@ -560,7 +681,7 @@ func menuListener(cmd []string) {
 	case "back":
 		shellMenuContext = "listenersmain"
 		prompt.Config.AutoComplete = getCompleter("listenersmain")
-		prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m]»\033[0m ")
+		prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m]»\033[0m ")
 	case "delete":
 		if confirm(fmt.Sprintf("Are you sure you want to delete the %s listener?", shellListener.name)) {
 			um := listenerAPI.Remove(shellListener.name)
@@ -569,7 +690,7 @@ func menuListener(cmd []string) {
 				shellListenerOptions = nil
 				shellMenuContext = "listenersmain"
 				prompt.Config.AutoComplete = getCompleter("listenersmain")
-				prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m]»\033[0m ")
+				prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m]»\033[0m ")
 			} else {
 				MessageChannel <- um
 			}
@@ -618,7 +739,7 @@ func menuListener(cmd []string) {
 			MessageChannel <- um
 			break
 		}
-		prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m][\033[33m" + options["Name"] + "\033[31m]»\033[0m ")
+		prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m][\033[33m" + options["Name"] + "\033[31m]»\033[0m ")
 	case "set":
 		MessageChannel <- listenerAPI.SetOption(shellListener.id, cmd)
 	case "start":
@@ -667,7 +788,7 @@ func menuListeners(cmd []string) {
 				shellListenerOptions = nil
 				shellMenuContext = "listenersmain"
 				prompt.Config.AutoComplete = getCompleter("listenersmain")
-				prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m]»\033[0m ")
+				prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m]»\033[0m ")
 			}
 		}
 	case "help":
@@ -731,7 +852,7 @@ func menuListeners(cmd []string) {
 			}
 			shellMenuContext = "listener"
 			prompt.Config.AutoComplete = getCompleter("listener")
-			prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m][\033[33m" + name + "\033[31m]»\033[0m ")
+			prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m][\033[33m" + name + "\033[31m]»\033[0m ")
 		} else {
 			MessageChannel <- messages.UserMessage{
 				Level:   messages.Note,
@@ -778,7 +899,7 @@ func menuListeners(cmd []string) {
 					shellListenerOptions["Protocol"] = strings.ToLower(cmd[1])
 					shellMenuContext = "listenersetup"
 					prompt.Config.AutoComplete = getCompleter("listenersetup")
-					prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m][\033[33m" + strings.ToLower(cmd[1]) + "\033[31m]»\033[0m ")
+					prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m][\033[33m" + strings.ToLower(cmd[1]) + "\033[31m]»\033[0m ")
 				}
 			}
 		}
@@ -798,7 +919,7 @@ func menuListenerSetup(cmd []string) {
 	case "back":
 		shellMenuContext = "listenersmain"
 		prompt.Config.AutoComplete = getCompleter("listenersmain")
-		prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m]»\033[0m ")
+		prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m]»\033[0m ")
 	case "exit", "quit":
 		if len(cmd) > 1 {
 			if strings.ToLower(cmd[1]) == "-y" {
@@ -866,7 +987,7 @@ func menuListenerSetup(cmd []string) {
 		}
 		shellMenuContext = "listener"
 		prompt.Config.AutoComplete = getCompleter("listener")
-		prompt.SetPrompt("\033[31mMerlin[\033[32mlisteners\033[31m][\033[33m" + options["Name"] + "\033[31m]»\033[0m ")
+		prompt.SetPrompt("\033[31mkubesploit[\033[32mlisteners\033[31m][\033[33m" + options["Name"] + "\033[31m]»\033[0m ")
 	default:
 		if len(cmd) > 1 {
 			executeCommand(cmd[0], cmd[1:])
@@ -888,15 +1009,18 @@ func menuSetModule(cmd string) {
 		if m.Name != "" {
 			shellModule = m
 			prompt.Config.AutoComplete = getCompleter("module")
-			prompt.SetPrompt("\033[31mMerlin[\033[32mmodule\033[31m][\033[33m" + shellModule.Name + "\033[31m]»\033[0m ")
+			prompt.SetPrompt("\033[31mkubesploit[\033[32mmodule\033[31m][\033[33m" + shellModule.Name + "\033[31m]»\033[0m ")
 			shellMenuContext = "module"
+		}
+		if GlobalYamlConfig.AutoSetAllAgents == "true" {
+			shellModule.SetAgent("all")
 		}
 	}
 }
 
 func menuSetMain() {
 	prompt.Config.AutoComplete = getCompleter("main")
-	prompt.SetPrompt("\033[31mMerlin»\033[0m ")
+	prompt.SetPrompt("\033[31mkubesploit»\033[0m ")
 	shellMenuContext = "main"
 }
 
@@ -917,6 +1041,7 @@ func getCompleter(completer string) *readline.PrefixCompleter {
 		),
 		readline.PcItem("listeners"),
 		readline.PcItem("remove",
+			readline.PcItem("all"),
 			readline.PcItemDynamic(agents.GetAgentList()),
 		),
 		readline.PcItem("sessions"),
@@ -957,6 +1082,7 @@ func getCompleter(completer string) *readline.PrefixCompleter {
 		readline.PcItem("cmd"),
 		readline.PcItem("back"),
 		readline.PcItem("download"),
+		readline.PcItem("interactive"),
 		readline.PcItem("execute-shellcode",
 			readline.PcItem("self"),
 			readline.PcItem("remote"),
@@ -1063,7 +1189,7 @@ func getCompleter(completer string) *readline.PrefixCompleter {
 func menuHelpMain() {
 	MessageChannel <- messages.UserMessage{
 		Level:   messages.Plain,
-		Message: color.YellowString("Merlin C2 Server (version %s)\n", merlin.Version),
+		Message: color.YellowString("Merlin C2 Server (version %s)\n", kubesploitVersion.Version),
 		Time:    time.Now().UTC(),
 		Error:   false,
 	}
@@ -1145,6 +1271,7 @@ func menuHelpAgent() {
 		{"back", "Return to the main menu", ""},
 		{"download", "Download a file from the agent", "download <remote_file>"},
 		{"execute-shellcode", "Execute shellcode", "self, remote <pid>, RtlCreateUserThread <pid>"},
+		{"interactive", "Interactive shell", ""},
 		{"info", "Display all information about the agent", ""},
 		{"kill", "Instruct the agent to die or quit", ""},
 		{"ls", "List directory contents", "ls /etc OR ls C:\\\\Users"},

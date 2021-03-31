@@ -1,0 +1,26 @@
+{
+  "base": {
+    "name": "K8sClusterCVEScan",
+    "type": "standard",
+    "author": ["Eviatar Gerzi (@g3rzi)"],
+    "credits": [],
+    "path": ["linux", "go", "clusterCVEScan.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Go",
+    "privilege": false,
+    "GoInterpreter": true,
+    "GoInterpreterProgress": false,
+    "notes": "",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "url", "value": "https://<k8s_master>", "required": true, "flag": "", "description": "Kubernetes cluster address"}
+    ],
+    "description": "Scans Kubernetes cluster for known CVEs",
+    "commands": [
+      "data/modules/go/scan/clusterCVEs/main.go",
+      "mainfunc(\"{{url}}\")"
+    ]
+  }
+}

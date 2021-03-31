@@ -1,33 +1,35 @@
-// Merlin is a post-exploitation command and control framework.
-// This file is part of Merlin.
-// Copyright (C) 2020  Russel Van Tuyl
+// Kubesploit is a post-exploitation command and control framework built on top of Merlin by Russel Van Tuyl.
+// This file is part of Kubesploit.
+// Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
-// Merlin is free software: you can redistribute it and/or modify
+// Kubesploit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // any later version.
 
-// Merlin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// Kubesploit is distributed in the hope that it will be useful for enhancing organizations' security.
+// Kubesploit shall not be used in any malicious manner.
+// Kubesploit is distributed AS-IS, WITHOUT ANY WARRANTY; including the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Merlin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Kubesploit.  If not, see <http://www.gnu.org/licenses/>.
 
 package modules
 
 import (
 	// Standard
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"time"
 
 	// Merlin
-	"github.com/Ne0nd0g/merlin/pkg/agents"
-	agentAPI "github.com/Ne0nd0g/merlin/pkg/api/agents"
-	"github.com/Ne0nd0g/merlin/pkg/api/messages"
-	"github.com/Ne0nd0g/merlin/pkg/modules"
+	"kubesploit/pkg/agents"
+	agentAPI "kubesploit/pkg/api/agents"
+	"kubesploit/pkg/api/messages"
+	"kubesploit/pkg/modules"
 )
 
 // GetModuleListCompleter return a tab completer of available modules for CLI interactions
@@ -47,6 +49,14 @@ func GetModule(modulePath string) (messages.UserMessage, modules.Module) {
 // RunModule executes the provided module
 func RunModule(module modules.Module) []messages.UserMessage {
 	var returnMessages []messages.UserMessage
+	if module.GoInterpreter == true || module.GoInterpreterProgress == true {
+		for index, command := range module.Commands {
+			if content, err := ioutil.ReadFile(command); err == nil {
+				module.Commands[index] = string(content)
+			}
+		}
+	}
+
 	r, err := modules.Run(module)
 	if err != nil {
 		returnMessages = append(returnMessages, messages.ErrorMessage(err.Error()))
@@ -82,8 +92,14 @@ func RunModule(module modules.Module) []messages.UserMessage {
 			}
 			switch strings.ToLower(module.Type) {
 			case "standard":
-				// Standard modules use the `cmd` message type that must be in position 0
-				returnMessages = append(returnMessages, agentAPI.CMD(id, append([]string{"cmd"}, r...)))
+				if module.GoInterpreter{
+					returnMessages = append(returnMessages, agentAPI.CMDGO(id, r))
+				} else if module.GoInterpreterProgress{
+					returnMessages = append(returnMessages, agentAPI.CMDGOPROG(id, r))
+				} else {
+				        // Standard modules use the `cmd` message type that must be in position 0
+					returnMessages = append(returnMessages, agentAPI.CMD(id, append([]string{"cmd"}, r...)))
+				}
 			case "extended":
 				// Was using Method: r[0]
 				job, err := agents.AddJob(id, r[0], r[1:])
@@ -103,8 +119,14 @@ func RunModule(module modules.Module) []messages.UserMessage {
 	// Single Agent
 	switch strings.ToLower(module.Type) {
 	case "standard":
-		// Standard modules use the `cmd` message type that must be in position 0
-		returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, append([]string{"cmd"}, r...)))
+		if module.GoInterpreter{
+			returnMessages = append(returnMessages, agentAPI.CMDGO(module.Agent, r))
+		} else if module.GoInterpreterProgress{
+			returnMessages = append(returnMessages, agentAPI.CMDGOPROG(module.Agent, r))
+		} else {
+		        // Standard modules use the `cmd` message type that must be in position 0
+			returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, append([]string{"cmd"}, r...)))
+		}
 	case "extended":
 		job, err := agents.AddJob(module.Agent, r[0], r[1:])
 		if err != nil {
