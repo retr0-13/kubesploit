@@ -1,4 +1,5 @@
 [![License][license-img]][license]
+![Python](https://img.shields.io/badge/go-v1.14-blue.svg?style=plastic)
 
 # Kubesploit
 
