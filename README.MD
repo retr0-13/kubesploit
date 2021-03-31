@@ -1,3 +1,5 @@
+[![License][license-img]][license]
+
 # Kubesploit
 
 <p align="left">
@@ -97,3 +99,7 @@ For the full license text see [`LICENSE`](LICENSE).
 ## Share Your Thoughts And Feedback
 For more comments, suggestions or questions, you can contact Eviatar Gerzi ([@g3rzi](https://twitter.com/g3rzi)) from CyberArk Labs or open an issue.
 You can find more projects developed by us at https://github.com/cyberark/.
+
+
+[license-img]: https://img.shields.io/github/license/cyberark/kubesploit.svg
+[license]: https://github.com/cyberark/kubesploit/blob/master/LICENSE
