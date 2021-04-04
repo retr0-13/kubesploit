@@ -9,60 +9,82 @@ import (
 	"strings"
 )
 
-func extractDeviceType() (string,error) {
+func extractDeviceType(deviceType string) (string,error) {
 	var err error
 	var device string
 
-	foundUUID := false
-	dat, err := ioutil.ReadFile("/proc/cmdline")
-	if err == nil {
-		cmdline := string(dat)
-		splittedCmdLine := strings.Split(cmdline, " ")
-
-		var uuid string
-
-		// extracting the UUID of the device
-		for _, splitLine := range splittedCmdLine {
-			if strings.HasPrefix(splitLine, "root=UUID"){
-				uuid = splitLine[10:]
-				foundUUID = true
+    if deviceType != "" {
+		cmd := exec.Command("blkid")
+		stdout, err := cmd.Output()
+		if err == nil {
+			//fmt.Println(string(stdout))
+			lines := strings.Split(string(stdout), "\n")
+			for _, line := range lines {
+				if strings.Contains(line, "ext4") {
+					deviceSplitted := strings.Split(line, ":")
+					device = deviceSplitted[0]
+					break
+				}
 			}
 		}
 
-		if foundUUID {
-			cmd := exec.Command("blkid")
-			stdout, err := cmd.Output()
+	} else {
+		foundUUID := false
+		dat, err := ioutil.ReadFile("/proc/cmdline")
+		if err == nil {
+			cmdline := string(dat)
+			splittedCmdLine := strings.Split(cmdline, " ")
 
-			if err == nil {
-				//fmt.Println(string(stdout))
-				lines := strings.Split(string(stdout), "\n")
-				for _, line := range lines{
-					if strings.Contains(line, uuid) {
-						deviceSplitted := strings.Split(line, ":")
-						device = deviceSplitted[0]
+			var uuid string
+
+			// extracting the UUID of the device
+			for _, splitLine := range splittedCmdLine {
+				if strings.HasPrefix(splitLine, "root=UUID") {
+					uuid = splitLine[10:]
+					foundUUID = true
+				}
+			}
+
+			if foundUUID {
+				cmd := exec.Command("blkid")
+				stdout, err := cmd.Output()
+
+				if err == nil {
+					//fmt.Println(string(stdout))
+					lines := strings.Split(string(stdout), "\n")
+					for _, line := range lines {
+						if strings.Contains(line, uuid) {
+							deviceSplitted := strings.Split(line, ":")
+							device = deviceSplitted[0]
+						}
 					}
 				}
 			}
 		}
 	}
 
+
 	return device,err
 }
+
 
 // devices:
 // /dev/sda1
 // /dev/xvda1
-func mainfunc(device string, useBruteforce string){
+func mainfunc(device string, useBruteforce string, deviceType string){
 	var err error
 	var devices []string
-	if device == "" {
+	// TODO: Need to remove 'device == "none"` and fix it inside the Run function in pkg/modules/modules.go.
+	// It happens because when there is no value, it removed the array with the 'append' command.
+	// The "none" is just a workaround for now
+	if device == "" || device == "none" {
 		if useBruteforce == "true" {
 
 			fmt.Println("[*] Using brute force on known devices [\"/dev/sda1\", \"/dev/xvda1\"]")
 			devices = append(devices, "/dev/sda1")
 			devices = append(devices, "/dev/xvda1")
 		} else {
-			device,err = extractDeviceType()
+			device,err = extractDeviceType(deviceType)
 			if device == "" || err != nil {
 				fmt.Println("[*] Didn't find device name, using brute force on known devices [\"/dev/sda1\", \"/dev/xvda1\"]")
 				devices = append(devices, "/dev/sda1")
@@ -103,9 +125,9 @@ func mainfunc(device string, useBruteforce string){
 	}
 }
 
-
+/*
 func main(){
-	mainfunc("", "false")
+	mainfunc("", "false", "ext4")
    // mainfunc("/dev/sda1", "false")
    // mainfunc("", "true")
-}
+}*/

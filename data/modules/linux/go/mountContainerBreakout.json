@@ -1,6 +1,6 @@
 {
   "base": {
-    "name": "Container Breakout via mounting",
+    "name": "ContainerBreakoutMounting",
     "type": "standard",
     "author": ["Eviatar Gerzi (@g3rzi)"],
     "credits": [],
@@ -15,13 +15,14 @@
     "remote": "",
     "local": [],
     "options": [
-      {"name": "Device", "value": "", "required": false, "flag": "", "description": "Use known device name (i.e \"/dev/sda1\", \"/dev/xvda1\")"},
-      {"name": "UseBruteforce", "value": "false", "required": false, "flag": "", "description": "Use the \"true\" value to use brute force on known devices: \"/dev/sda1\" and \"/dev/xvda1\")"}
+      {"name": "Device", "value": "none", "required": false, "flag": "", "description": "Use known device name (i.e \"/dev/sda1\", \"/dev/xvda1\")"},
+      {"name": "UseBruteforce", "value": "false", "required": false, "flag": "", "description": "Use the \"true\" value to use brute force on known devices: \"/dev/sda1\" and \"/dev/xvda1\")"},
+      {"name": "DeviceType", "value": "ext4", "required": false, "flag": "", "description": "Searching by device type. The default is \"ext4\", and to disable, set an empty string \"\"."}
     ],
     "description": "Break out from the container to the host using mounting. It will create a mounted host folder named /mnt<number>",
     "commands": [
       "data/modules/go/mountBreakout/main.go",
-      "mainfunc(\"{{Device}}\", \"{{UseBruteforce}}\")"
+      "mainfunc(\"{{Device}}\", \"{{UseBruteforce}}\", \"{{DeviceType}}\")"
     ]
   }
 }

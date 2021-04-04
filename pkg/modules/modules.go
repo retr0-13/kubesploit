@@ -129,7 +129,11 @@ func Run(m Module) ([]string, error) {
 			// Check if an option was set WITHOUT the Flag or Value qualifiers
 			if reName.MatchString(command[k]) {
 				if o.Value != "" {
-					command[k] = reName.ReplaceAllString(command[k], o.Flag+" "+o.Value)
+					flagSpace := ""
+					if o.Flag != "" {
+						flagSpace = " "
+					}
+					command[k] = reName.ReplaceAllString(command[k], o.Flag+flagSpace+o.Value)
 				} else {
 					command = append(command[:k], command[k+1:]...)
 				}
