@@ -16,7 +16,7 @@ BIN=data/bin/
 XBUILD=-X main.build=${BUILD} -X github.com/cyberark/kubesploit/pkg/agent.build=${BUILD}
 URL ?= https://127.0.0.1:443
 XURL=-X main.url=${URL}
-PSK ?= merlin
+PSK ?= kubesploit
 XPSK=-X main.psk=${PSK}
 PROXY ?=
 XPROXY =-X main.proxy=$(PROXY)
