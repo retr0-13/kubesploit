@@ -60,7 +60,7 @@ To run quick build for Linux, you can run the following:
 ```
 export PATH=$PATH:/usr/local/go/bin
 go build -o agent cmd/merlinagent/main.go
-go build -o agent cmd/merlinserver/main.go
+go build -o server cmd/merlinserver/main.go
 ```
 
 ## Mitigations 
