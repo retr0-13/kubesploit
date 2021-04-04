@@ -1,15 +1,19 @@
 # !!!MAKE SURE YOUR GOPATH ENVIRONMENT VARIABLE IS SET FIRST!!!
 
+# Quick start:
+# make
+# After it finish, it will created files in data/temp/<version>/<id>/
+# Then you can package it by running: "make package-agent-linux" or "make package-all"
 # Merlin Server & Agent version number
 VERSION=$(shell cat pkg/merlin.go |grep "const Version ="|cut -d"\"" -f2)
 
-MSERVER=merlinServer
-MAGENT=merlinAgent
-PASSWORD=merlin
+MSERVER=kubesploitServer
+MAGENT=kubesploitAgent
+PASSWORD=kubesploit
 BUILD=$(shell git rev-parse HEAD)
 DIR=data/temp/v${VERSION}/${BUILD}
 BIN=data/bin/
-XBUILD=-X main.build=${BUILD} -X github.com/Ne0nd0g/merlin/pkg/agent.build=${BUILD}
+XBUILD=-X main.build=${BUILD} -X github.com/cyberark/kubesploit/pkg/agent.build=${BUILD}
 URL ?= https://127.0.0.1:443
 XURL=-X main.url=${URL}
 PSK ?= merlin
@@ -27,9 +31,9 @@ WINAGENTLDFLAGS=-ldflags "-s -w ${XBUILD} ${XPROTO} ${XURL} ${XHOST} ${XPSK} ${X
 # TODO Update when Go1.13 is released https://stackoverflow.com/questions/45279385/remove-file-paths-from-text-directives-in-go-binaries
 GCFLAGS=-gcflags=all=-trimpath=$(GOPATH)
 ASMFLAGS=-asmflags=all=-trimpath=$(GOPATH)# -asmflags=-trimpath=$(GOPATH)
-PACKAGE=7za a -p${PASSWORD} -mhe -mx=9
-F=README.MD LICENSE data/modules docs data/README.MD data/agents/README.MD data/db/ data/log/README.MD data/x509 data/src data/bin data/html
-F2=LICENSE
+PACKAGE=7za a -p${PASSWORD} #-mhe -mx=9
+F=README.MD LICENSE NOTICES.txt config.yaml kubesploit.yara data/bin data/html data/modules
+F2=LICENSE NOTICES.txt
 W=Windows-x64
 L=Linux-x64
 A=Linux-arm
@@ -41,7 +45,8 @@ export GO111MODULE=on
 $(shell mkdir -p ${DIR})
 
 # Change default to just make for the host OS and add MAKE ALL to do this
-default: server-windows agent-windows server-linux agent-linux server-darwin agent-darwin agent-dll agent-javascript prism-windows prism-linux prism-darwin
+#default: server-windows agent-windows server-linux agent-linux server-darwin agent-darwin agent-dll agent-javascript prism-windows prism-linux prism-darwin
+default: server-linux agent-linux server-darwin agent-darwin agent-javascript prism-linux prism-darwin
 
 all: default
 
@@ -169,7 +174,8 @@ package-prism-darwin:
 	cp ${DIR}/PRISM-${D} ${BIN}darwin/
 
 # Package agents and PRISM first so that they can be included in the Server distro
-package-all: package-agent-windows package-agent-dll package-agent-linux package-agent-darwin package-prism-windows package-prism-linux package-prism-darwin package-server-linux package-server-windows package-server-darwin
+#package-all: package-agent-windows package-agent-dll package-agent-linux package-agent-darwin package-prism-windows package-prism-linux package-prism-darwin package-server-linux package-server-windows package-server-darwin
+package-all: package-agent-linux package-agent-darwin package-prism-linux package-prism-darwin package-server-linux package-server-darwin
 
 clean:
 	rm -rf ${DIR}*
