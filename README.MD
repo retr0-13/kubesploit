@@ -4,7 +4,7 @@
 # Kubesploit
 
 <p align="left">
-  <img src="https://github.com/cyberark/kubesploit/blob/assets/1.5x/kubesploit@1.5x-100.jpg?raw=true" height="30%" width="30%">
+  <img src="https://github.com/cyberark/kubesploit/blob/assets/1.5x/kubesploit@1.5x-100_tiny.jpg?raw=true" height="30%" width="30%">
 </p>
 
 
