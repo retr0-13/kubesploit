@@ -1,5 +1,7 @@
 [![License][license-img]][license]
 ![Python](https://img.shields.io/badge/go-v1.14-blue.svg?style=plastic)
+![Downloads][download]
+
 
 # Kubesploit
 
@@ -104,3 +106,4 @@ You can find more projects developed by us at https://github.com/cyberark/.
 
 [license-img]: https://img.shields.io/github/license/cyberark/kubesploit.svg
 [license]: https://github.com/cyberark/kubesploit/blob/master/LICENSE
+[download]: https://img.shields.io/github/downloads/cyberark/kubesploit/total?logo=github
