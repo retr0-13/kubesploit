@@ -48,6 +48,20 @@
        2. Preventing authorization to anyone: `authorization: mode:` NOT set with AlwaysAllow. <br>
        </td>
     </tr>	
-    
-  </tbody>
+      <tr>
+      <td>
+         Pod Escape Using Log Mounts
+      </td>
+      <td align="left">         
+          A pod running as root and with a mount point to the node’s /var/log directory can expose the entire contents of its host filesystem to any user who has access to its logs. <br>
+      </td>
+      <td align="left" ><br> 
+       1. Avoid running pod as root.  <br>
+       2. Don’t deploy pods with a writeable hostPath to /var/log. <br>
+          Another option related to 2: Don’t allow volume mounts from the /var/log path 
+       </td>
+    </tr>	
+
+</tbody>
 </table>
+
