@@ -23,8 +23,9 @@ package agent
 import (
 	"bufio"
 	b64 "encoding/base64"
-	"kubesploit/pkg/messages"
+	"github.com/mattn/go-shellwords"
 	"github.com/traefik/yaegi/stdlib/unrestricted"
+	"kubesploit/pkg/messages"
 	"runtime"
 	"time"
 
@@ -37,18 +38,16 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	// 3rd Party
-	"github.com/mattn/go-shellwords"
 )
 
 // https://github.com/containous/yaegi/blob/f19b7563ea92b5c467c9e5e325a0a5b559712473/interp/interp_file_test.go
 // ExecuteCommandGoInterpreter is function used to instruct an agent to execute go code via Go interpreter ("yeagi") on the host operating system
 func ExecuteCommandGoInterpreter(name string, args []string) (stdout string, stderr string) {
-/*
-	argS, errS := shellwords.Parse(arg)
-	if errS != nil {
-		return "", fmt.Sprintf("There was an error parsing command line argments: %s\r\n%s", arg, errS.Error())
-	}*/
+	/*
+		argS, errS := shellwords.Parse(arg)
+		if errS != nil {
+			return "", fmt.Sprintf("There was an error parsing command line argments: %s\r\n%s", arg, errS.Error())
+		}*/
 
 	backupStdout := os.Stdout
 	defer func() { os.Stdout = backupStdout }()
@@ -253,8 +252,6 @@ func ExecuteCommandGoInterpreterProgress(name string, args []string, result mess
 
 	return stdout, stderr
 }
-
-// ExecuteCommand is function used to instruct an agent to execute a command on the host operating system
 func ExecuteCommand(name string, arg string) (stdout string, stderr string) {
 	var cmd *exec.Cmd
 
@@ -264,6 +261,29 @@ func ExecuteCommand(name string, arg string) (stdout string, stderr string) {
 	}
 
 	cmd = exec.Command(name, argS...) // #nosec G204
+
+	out, err := cmd.CombinedOutput()
+	stdout = string(out)
+	stderr = ""
+
+	if err != nil {
+		stderr = err.Error()
+	}
+
+	return stdout, stderr
+}
+
+// ExecuteCommand is function used to instruct an agent to execute a command on the host operating system
+func ExecuteCommandScriptInCommands(name string, arg string) (stdout string, stderr string) {
+	var cmd *exec.Cmd
+
+	argS, errS := shellwords.Parse(arg)
+	if errS != nil {
+		return "", fmt.Sprintf("There was an error parsing command line argments: %s\r\n%s", arg, errS.Error())
+	}
+
+	cmd = exec.Command(argS[0],argS[1],name,"_", argS[2]) // #nosec G204
+
 
 	out, err := cmd.CombinedOutput()
 	stdout = string(out)

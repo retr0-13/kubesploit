@@ -445,7 +445,7 @@ func Shell() {
 				case "cd":
 					MessageChannel <- agentAPI.CD(shellAgent, cmd)
 				case "cmd", "shell":
-					MessageChannel <- agentAPI.CMD(shellAgent, cmd)
+					MessageChannel <- agentAPI.CMD(shellAgent, cmd[1:],"cmd")
 				case "download":
 					MessageChannel <- agentAPI.Download(shellAgent, cmd)
 				case "execute-shellcode":

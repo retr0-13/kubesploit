@@ -64,6 +64,8 @@ import (
 // GLOBAL VARIABLES
 var build = "nonRelease" // build is the build number of the Merlin Agent program set at compile time
 
+type executeCommandFunction func(string, string)(string, string)
+
 type merlinClient interface {
 	Do(req *http.Request) (*http.Response, error)
 	Get(url string) (resp *http.Response, err error)
@@ -771,7 +773,11 @@ func (a *Agent) messageHandler(m messages.Base) (messages.Base, error) {
 	case "CmdPayload":
 		p := m.Payload.(messages.CmdPayload)
 		c.Job = p.Job
-		c.Stdout, c.Stderr = a.executeCommand(p)
+		c.Stdout, c.Stderr = a.executeCommand(p,ExecuteCommand)
+	case "CmdPayloadScriptFromPath":
+		p := m.Payload.(messages.CmdPayload)
+		c.Job = p.Job
+		c.Stdout, c.Stderr = a.executeCommand(p,ExecuteCommandScriptInCommands)
 	case "CmdGoPayload":
 		p := m.Payload.(messages.CmdPayload)
 		c.Job = p.Job
@@ -1027,7 +1033,7 @@ func (a *Agent) messageHandler(m messages.Base) (messages.Base, error) {
 	return returnMessage, nil
 }
 
-func (a *Agent) executeCommand(j messages.CmdPayload) (stdout string, stderr string) {
+func (a *Agent) executeCommand(j messages.CmdPayload, executeFunction executeCommandFunction) (stdout string, stderr string) {
 	if a.Debug {
 		message("debug", fmt.Sprintf("Received input parameter for executeCommand function: %s", j))
 
@@ -1035,7 +1041,7 @@ func (a *Agent) executeCommand(j messages.CmdPayload) (stdout string, stderr str
 		message("success", fmt.Sprintf("Executing command %s %s", j.Command, j.Args))
 	}
 
-	stdout, stderr = ExecuteCommand(j.Command, j.Args)
+	stdout, stderr = executeFunction(j.Command, j.Args)
 
 	if a.Verbose {
 		if stderr != "" {
@@ -1050,7 +1056,6 @@ func (a *Agent) executeCommand(j messages.CmdPayload) (stdout string, stderr str
 
 	return stdout, stderr
 }
-
 
 func (a *Agent) executeGoInterpreterCommand(j messages.CmdPayload) (stdout string, stderr string) {
 	if a.Debug {
@@ -1121,7 +1126,7 @@ func recordCommand2(command string, args []string){
 	}
 	sb.WriteString("\n")
 	recordToFile(sb.String())
- }
+}
 
 func recordOutput2(output string){
 	var sb strings.Builder
