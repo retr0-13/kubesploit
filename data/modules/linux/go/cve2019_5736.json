@@ -19,7 +19,7 @@
     ],
     "description": "Exploit for the runc vulnerability (CVE-2019-5736) that allows attackers to overwrite the host runc binary (and consequently obtain host root access) by leveraging the ability to execute a command as root within one of these types of containers: \n\t(1) a new container with an attacker-controlled image \n\t(2) an existing container, to which the attacker previously had write access, that can be attached with docker exec. \nThis occurs because of file-descriptor mishandling, related to /proc/self/exe",
     "commands": [
-      "data/modules/go/CVE-2019-5736/main.go",
+      "data/modules/sourcecode/go/CVE-2019-5736/main.go",
       "mainfunc(\"{{Payload}}\")"
     ]
   }

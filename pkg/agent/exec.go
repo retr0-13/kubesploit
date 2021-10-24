@@ -281,9 +281,11 @@ func ExecuteCommandScriptInCommands(name string, arg string) (stdout string, std
 	if errS != nil {
 		return "", fmt.Sprintf("There was an error parsing command line argments: %s\r\n%s", arg, errS.Error())
 	}
-
-	cmd = exec.Command(argS[0],argS[1],name,"_", argS[2]) // #nosec G204
-
+	if 2< len(argS) {
+		cmd = exec.Command(argS[0],argS[1],name,"_", argS[2]) // #nosec G204
+	} else {
+		cmd = exec.Command(argS[0],argS[1],name) // #nosec G204
+	}
 
 	out, err := cmd.CombinedOutput()
 	stdout = string(out)

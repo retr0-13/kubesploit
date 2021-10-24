@@ -3,8 +3,8 @@
     "name": "deepce",
     "type": "standard",
     "author": ["Matthew Rollings,Integration to kubesploit Yaniv Yakobovich(@yanivyakobovich)"],
-    "credits": ["Matthew Rollings"],
-    "path": ["linux", "shell", "shell-test.json"],
+    "credits": ["Matthew Rollings @stealthcopter"],
+    "path": ["linux", "shell", "deepce.json"],
     "platform": "linux",
     "arch": "x64",
     "lang": "Shell",
@@ -16,14 +16,14 @@
     "remote": "",
     "local": [],
     "options": [
-      {"name": "Parameter", "value": "--help", "required": false, "flag": "", "description": "Parameters to add for the script \n With Parameter set to \"\" the script with no Parameters which mean the regular scan will take place \n set Parameter to --help and see all the possibilities"}
+      {"name": "Parameter", "value": "", "required": false, "flag": "", "description": "Parameters to add for the script \n With no Parameter when Parameter is set to \"\" the script scan will take place \n set Parameter to --help and see all the possibilities"}
     ],
-    "description": "Docker Enumeration, Escalation of Privileges and Container Escapes (DEEPCE) visit https://github.com/stealthcopter/deepce for full details",
+    "description": "Docker Enumeration (DEEPCE) visit https://github.com/stealthcopter/deepce for full details",
     "commands": [
-      "data/modules/sh/deepce/deepce.sh",
+      "data/modules/sourcecode/sh/deepce/deepce.sh",
       "sh",
       "-c",
-      "{{Parameter}}"
+      "\"{{Parameter}}\""
     ]
   }
 }

