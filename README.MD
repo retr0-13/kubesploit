@@ -66,7 +66,7 @@ go build -o server cmd/merlinserver/main.go
 ```
 ### Dockerizing
 In order to run the _server_ using a container, you have to make the Merlin server listen on the `0.0.0.0` interface (and not `127.0.0.1`).
-You can update the interface field in the [config.yaml](https://github.com/aviadhahami/kubesploit/blob/main/config.yaml).
+You can update the interface field in the [config.yaml](https://github.com/cyberark/kubesploit/blob/main/config.yaml).
 > sidenote: make sure to bind ports between the host and container (the default port is `443` and it can be configured in the config.yaml as well)
 
 
