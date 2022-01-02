@@ -564,9 +564,12 @@ func PrintDecodedToken(tokenString string) {
 	sDec, _  := b64.StdEncoding.DecodeString(splittedToken[1])
 	newDec:= string(sDec)
 	newDec = strings.Replace(newDec, "\r\n", "\n", -1)
-
+	if !strings.HasSuffix(newDec, "}"){
+		newDec += "}"
+	}
+	
 	var jwtToken JWTToken
-	err := json.Unmarshal([]byte(sDec), &jwtToken)
+	err := json.Unmarshal([]byte(newDec), &jwtToken)
 	if err != nil {
 		fmt.Printf("[*] Failed to print %s", err)
 	} else {
