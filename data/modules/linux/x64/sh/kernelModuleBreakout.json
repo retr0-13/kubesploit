@@ -2,8 +2,8 @@
   "base": {
     "name": "kernelModuleBreakout",
     "type": "standard",
-    "author": ["Yaniv Yakobovich"],
-    "credits": ["Nishant Sharma - https://blog.pentesteracademy.com/abusing-sys-module-capability-to-perform-docker-container-breakout-cf5c29956edd , @willrushi - https://github.com/stealthcopter/deepce, "],
+    "author": ["Will Roberts @willrushi"],
+    "credits": ["Will Roberts @willrushi , Nishant Sharma - https://blog.pentesteracademy.com/abusing-sys-module-capability-to-perform-docker-container-breakout-cf5c29956edd "],
     "path": ["linux", "shell", "kernelModuleBreakout.json"],
     "platform": "linux",
     "arch": "x64",

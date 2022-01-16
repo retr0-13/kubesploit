@@ -41,7 +41,7 @@ $DG            \____\_______/$NC
    \__,_/\___/\___/ .___/\___/\___/$DG  ESCAPE$NC
                  /_/
 
- Docker Enumeration, Escalation of Privileges and Container Escapes (DEEPCE)
+ Docker Enumeration (DEEPCE)
  by stealthcopter
 
 EOF

