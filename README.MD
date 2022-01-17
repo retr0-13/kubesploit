@@ -57,6 +57,8 @@ It’s a full simulation with a complete set of automated instructions on how to
 ## Build
 To build this project, run the `make` command from the root folder. 
 
+**NOTE:** Currently you'll need to use golang 1.13 or 1.14 based on the golang requirements that [traefik/yaegi v0.9.2](https://github.com/traefik/yaegi/tree/v0.9.2#features) have.
+
 ### Quick Build  
 To run quick build for Linux, you can run the following:  
 ```
