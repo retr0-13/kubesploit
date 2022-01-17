@@ -36,17 +36,35 @@ It is an ongoing project, and we are planning to add more modules related to Doc
 
 The currently available modules are:  
 - Container breakout using mounting
+
 - Container breakout using docker.sock
+
 - Container breakout using CVE-2019-5736 exploit
+
 - Scan for Kubernetes cluster known CVEs
+
 - Port scanning with focus on Kubernetes services
+
 - Kubernetes service scan from within the container
+
 - Light [kubeletctl](https://github.com/cyberark/kubeletctl) containing the following options:
   - Scan for containers with RCE
   - Scan for Pods and containers
   - Scan for tokens from all available containers
   - Run command with multiple options
- 
+
+- cGroup breakout
+
+- Kernel module breakout
+
+- Var log escape
+
+- Deepce: Docker enumeration (Open-Source project integrated as a module)
+
+- Vulnerability test: check which of kubesploit exploits your container is vulnerable to  
+
+  **For detailed information about the modules, check the WiKi page**
+
 
 ## Quick Start
 We created a dedicated [Kubernetes environment in Katacoda](https://www.katacoda.com/cyberarkcommons/scenarios/kubesploit) for you to experiment with Kubesploit.   
