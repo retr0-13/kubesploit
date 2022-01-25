@@ -97,7 +97,7 @@ EOF
   else
     echo "[!] Failed to mount module"
     exit 1
-  fiAbusing docker.sock to create container which has the root file system mounted in it. With a reverse shell gaining access to the root file system.
+  fi
 
   echo "[i] Cleaning up..."
 
