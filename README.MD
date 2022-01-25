@@ -75,6 +75,8 @@ It’s a full simulation with a complete set of automated instructions on how to
 ## Build
 To build this project, run the `make` command from the root folder. 
 
+**NOTE:** Currently you'll need to use golang 1.13 or 1.14 based on the golang requirements that [traefik/yaegi v0.9.2](https://github.com/traefik/yaegi/tree/v0.9.2#features) have.
+
 ### Quick Build  
 To run quick build for Linux, you can run the following:  
 ```
@@ -82,6 +84,11 @@ export PATH=$PATH:/usr/local/go/bin
 go build -o agent cmd/merlinagent/main.go
 go build -o server cmd/merlinserver/main.go
 ```
+### Dockerizing
+In order to run the _server_ using a container, you have to make the Kubesploit server listen on the `0.0.0.0` interface (and not `127.0.0.1`).
+You can update the interface field in the [config.yaml](https://github.com/cyberark/kubesploit/blob/main/config.yaml).
+> sidenote: make sure to bind ports between the host and container (the default port is `443` and it can be configured in the config.yaml as well)
+
 
 ## Mitigations 
 ### YARA rules
