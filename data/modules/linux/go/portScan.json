@@ -19,7 +19,7 @@
     ],
     "description": "Port scanning",
     "commands": [
-      "data/modules/go/scan/portScan/main.go",
+      "data/modules/sourcecode/go/scan/portScan/main.go",
       "mainfunc(\"{{Urls}}\")"
     ]
   }

@@ -61,9 +61,22 @@ func CD(agentID uuid.UUID, Args []string) messages.UserMessage {
 // Args[0] = "cmd"
 // Args[1:] = program and arguments to be executed on the host OS of the running agent
 // Used with `cmd` and `shell` commands as well as through "standard" modules
-func CMD(agentID uuid.UUID, Args []string) messages.UserMessage {
+//func CMD(agentID uuid.UUID, Args []string, jobType string) messages.UserMessage {
+//	if len(Args) > 0 {
+//		job, err := agents.AddJob(agentID, jobType, Args[1:])
+//		if err != nil {
+//			return messages.ErrorMessage(err.Error())
+//		}
+//		return messages.JobMessage(agentID, job)
+//	}
+//	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
+//}
+
+func CMD(agentID uuid.UUID, Args []string, jobType string) messages.UserMessage {
+	var job string
+	var err error
 	if len(Args) > 0 {
-		job, err := agents.AddJob(agentID, "cmd", Args[1:])
+		job, err = agents.AddJob(agentID, jobType, Args)
 		if err != nil {
 			return messages.ErrorMessage(err.Error())
 		}
@@ -75,31 +88,31 @@ func CMD(agentID uuid.UUID, Args []string) messages.UserMessage {
 // CMDGO is used to send a command to the agent to run a command or execute a program
 // Args[0] = "cmdgo"
 // Args[1:] = program and arguments to be executed on the host OS of the running agent
-func CMDGO(agentID uuid.UUID, Args []string) messages.UserMessage {
-	if len(Args) > 0 {
-		job, err := agents.AddJob(agentID, "cmdgo", Args)
-		if err != nil {
-			return messages.ErrorMessage(err.Error())
-		}
-		return messages.JobMessage(agentID, job)
-	}
-	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
-}
-
-
-// CMDGOPROG is used to send a command to the agent to run a command or execute a program
-// Args[0] = "cmd"
-// Args[1:] = program and arguments to be executed on the host OS of the running agent
-func CMDGOPROG(agentID uuid.UUID, Args []string) messages.UserMessage {
-	if len(Args) > 0 {
-		job, err := agents.AddJob(agentID, "cmdgoprogress", Args)
-		if err != nil {
-			return messages.ErrorMessage(err.Error())
-		}
-		return messages.JobMessage(agentID, job)
-	}
-	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
-}
+//func CMDGO(agentID uuid.UUID, Args []string) messages.UserMessage {
+//	if len(Args) > 0 {
+//		job, err := agents.AddJob(agentID, "cmdgo", Args)
+//		if err != nil {
+//			return messages.ErrorMessage(err.Error())
+//		}
+//		return messages.JobMessage(agentID, job)
+//	}
+//	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
+//}
+//
+//
+//// CMDGOPROG is used to send a command to the agent to run a command or execute a program
+//// Args[0] = "cmd"
+//// Args[1:] = program and arguments to be executed on the host OS of the running agent
+//func CMDGOPROG(agentID uuid.UUID, Args []string) messages.UserMessage {
+//	if len(Args) > 0 {
+//		job, err := agents.AddJob(agentID, "cmdgoprogress", Args)
+//		if err != nil {
+//			return messages.ErrorMessage(err.Error())
+//		}
+//		return messages.JobMessage(agentID, job)
+//	}
+//	return messages.ErrorMessage("not enough arguments provided for the Agent Cmd call")
+//}
 
 
 // Download is used to download the file through the corresponding agent from the provided input file path

@@ -49,7 +49,7 @@ func GetModule(modulePath string) (messages.UserMessage, modules.Module) {
 // RunModule executes the provided module
 func RunModule(module modules.Module) []messages.UserMessage {
 	var returnMessages []messages.UserMessage
-	if module.GoInterpreter == true || module.GoInterpreterProgress == true {
+	if module.GoInterpreter == true || module.GoInterpreterProgress == true || module.LoadScriptFromPath == true {
 		for index, command := range module.Commands {
 			if content, err := ioutil.ReadFile(command); err == nil {
 				module.Commands[index] = string(content)
@@ -93,12 +93,19 @@ func RunModule(module modules.Module) []messages.UserMessage {
 			switch strings.ToLower(module.Type) {
 			case "standard":
 				if module.GoInterpreter{
-					returnMessages = append(returnMessages, agentAPI.CMDGO(id, r))
+					//returnMessages = append(returnMessages, agentAPI.CMDGO(id, r))
+					returnMessages = append(returnMessages, agentAPI.CMD(id, r,"cmdgo"))
 				} else if module.GoInterpreterProgress{
-					returnMessages = append(returnMessages, agentAPI.CMDGOPROG(id, r))
+					//returnMessages = append(returnMessages, agentAPI.CMDGOPROG(id, r))
+					returnMessages = append(returnMessages, agentAPI.CMD(id, r,"cmdgoprogress"))
+				} else if module.LoadScriptFromPath{
+					// Standard modules use the `cmd` message type that must be in position 0
+					//returnMessages = append(returnMessages, agentAPI.CMD(id, append([]string{"cmdScriptFromPath"}, r...),"cmdScriptFromPath"))
+					returnMessages = append(returnMessages, agentAPI.CMD(id, r,"cmdScriptFromPath"))
 				} else {
-				        // Standard modules use the `cmd` message type that must be in position 0
-					returnMessages = append(returnMessages, agentAPI.CMD(id, append([]string{"cmd"}, r...)))
+					// Standard modules use the `cmd` message type that must be in position 0
+					returnMessages = append(returnMessages, agentAPI.CMD(id, r,"cmd"))
+					//returnMessages = append(returnMessages, agentAPI.CMD(id, append([]string{"cmd"}, r...),"cmd"))
 				}
 			case "extended":
 				// Was using Method: r[0]
@@ -120,12 +127,19 @@ func RunModule(module modules.Module) []messages.UserMessage {
 	switch strings.ToLower(module.Type) {
 	case "standard":
 		if module.GoInterpreter{
-			returnMessages = append(returnMessages, agentAPI.CMDGO(module.Agent, r))
+			//returnMessages = append(returnMessages, agentAPI.CMDGO(module.Agent, r))
+			returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, r,"cmdgo"))
 		} else if module.GoInterpreterProgress{
-			returnMessages = append(returnMessages, agentAPI.CMDGOPROG(module.Agent, r))
+			//returnMessages = append(returnMessages, agentAPI.CMDGOPROG(module.Agent, r))
+			returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, r,"cmdgoprogress"))
+		} else if module.LoadScriptFromPath{
+			// Standard modules use the `cmd` message type that must be in position 0
+			//returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, append([]string{"cmdScriptFromPath"}, r...),"cmdScriptFromPath"))
+			returnMessages = append(returnMessages, agentAPI.CMD(module.Agent,  r,"cmdScriptFromPath"))
 		} else {
-		        // Standard modules use the `cmd` message type that must be in position 0
-			returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, append([]string{"cmd"}, r...)))
+			// Standard modules use the `cmd` message type that must be in position 0
+			//returnMessages = append(returnMessages, agentAPI.CMD(module.Agent, append([]string{"cmd"}, r...),"cmd"))
+			returnMessages = append(returnMessages, agentAPI.CMD(module.Agent,  r,"cmd"))
 		}
 	case "extended":
 		job, err := agents.AddJob(module.Agent, r[0], r[1:])

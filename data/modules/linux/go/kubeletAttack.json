@@ -20,7 +20,7 @@
     ],
     "description": "\nUrl - The address of the node with the open kubelet API\nCommand - there are number of options:\n\t1. run - run command on container\n\t   examples:\n\t     1.a. run \\\"whoami\\\" -n default -c alpine -p alpine\n\t     1.b. run -a\n\t     1.c. run -as\n\t2. rce - search for containers with RCE\n\t3. pods \n\t     3.a. pods -r\n\t4. token\n\n\tExamples:\n\t  run \\\"whoami\\\" -n default -c alpine -p alpine\n\t  run -a\n\t  run -as\n\t  token\n\t  pods\n\t  rce\n\n\tswitches:\n\t  \"-n\"  - namespace\n\t  \"-p\"  - pods name\n\t  \"-c\"  - container name\n\t  \"-a\"  - run command on all pods synchronically\n\t  \"-as\" - run command on all pods asynchronic\n\t  \"-r\" - print in raw (use with pods commands)",
     "commands": [
-      "data/modules/go/kubelet/main.go",
+      "data/modules/sourcecode/go/kubelet/main.go",
       "mainfunc(\"{{Url}}\", \"{{Command}}\")"
     ]
   }

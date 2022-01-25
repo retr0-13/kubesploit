@@ -20,7 +20,7 @@
       ],
       "description": "\n 1. [lsh|cath] <parameter> \n lsh - as ls command on the host \n cath - as cat command on the host file system \n parameter - the path you wish to query\n 2. scan [key|token] - scan for keys/token in the host\n The result of the scan is stored in a file at /exploit/host-data/\n. The file includes path for each corresponded match \n You can access the file through the bash module of the agent  ",
       "commands": [
-        "data/modules/go/var-log-escape/main.go",
+        "data/modules/sourcecode/go/var-log-escape/main.go",
         "mainfunc(\"{{Command}}\", \"{{Parameter}}\")"
       ]
     }
