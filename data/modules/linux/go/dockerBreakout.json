@@ -20,7 +20,7 @@
     ],
     "description": "Services scanning (/data/modules/go/services/mainfunc.go)",
     "commands": [
-      "data/modules/go/dockerSockBreakout/main.go",
+      "data/modules/sourcecode/go/dockerSockBreakout/main.go",
       "mainfunc(\"{{IP}}\", \"{{Port}}\")"
     ]
   }
