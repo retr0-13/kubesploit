@@ -641,8 +641,12 @@ func GetMessageForJob(agentID uuid.UUID, job Job) (messages.Base, error) {
 	}
 	m.Padding = core.RandStringBytesMaskImprSrc(Agents[agentID].PaddingMax)
 	switch job.Type {
-	case "cmd":
-		m.Type = "CmdPayload"
+	case "cmd","cmdScriptFromPath":
+		if job.Type == "cmd"{
+			m.Type = "CmdPayload"
+		}else {
+			m.Type = "CmdPayloadScriptFromPath"
+		}
 		p := messages.CmdPayload{
 			Command: job.Args[0],
 			Job:     job.ID,

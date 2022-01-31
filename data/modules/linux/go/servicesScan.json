@@ -21,7 +21,7 @@
     ],
     "description": "Services scanning (/data/modules/go/services/mainfunc.go)",
     "commands": [
-      "data/modules/go/scan/services/main.go",
+      "data/modules/sourcecode/go/scan/services/main.go",
       "mainfunc(\"{{CIDR}}\", \"{{Threads}}\", \"{{Interval}}\")"
     ]
   }

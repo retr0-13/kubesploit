@@ -21,7 +21,7 @@
     ],
     "description": "Break out from the container to the host using mounting. It will create a mounted host folder named /mnt<number>",
     "commands": [
-      "data/modules/go/mountBreakout/main.go",
+      "data/modules/sourcecode/go/mountBreakout/main.go",
       "mainfunc(\"{{Device}}\", \"{{UseBruteforce}}\", \"{{DeviceType}}\")"
     ]
   }

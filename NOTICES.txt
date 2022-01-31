@@ -22,7 +22,9 @@ Section 1: GPL-3.0
 
 Section 2: Apache 2.0
 ---------------------
-
+>>> https://github.com/stealthcopter/deepce
+    Copyright 2020 Matthew Rollings (@stealthcopter)	
+	
 >>> github.com/go-jose/go-jose (forked from: github.com/square/go-jose)
     Copyright (C) 2018 Square
 

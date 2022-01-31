@@ -65,7 +65,9 @@ type Module struct {
 	Powershell   interface{}    `json:"powershell,omitempty"` // An option json object containing commands and configuration items specific to PowerShell
 	GoInterpreter bool		    `json:"GoInterpreter"`       // Notification for Go code for the agent to use yaegi (Go interpreter)
 	GoInterpreterProgress bool  `json:"GoInterpreterProgress"`       // Notification for Go code that print while still in progress for the agent to use yaegi (Go interpreter)
+	LoadScriptFromPath bool		`json:"LoadScriptFromPath"`       // Notification for loading script from path into commands with the
 }
+//TODO add notification part
 
 // Option is a structure containing the keys for the object
 type Option struct {

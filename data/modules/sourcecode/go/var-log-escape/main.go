@@ -242,7 +242,7 @@ func attachToRoot() string {
 	if isRoot() {
 		if err := os.Symlink("/", fmt.Sprintf("%s%s", path, "/root_link")); err != nil {
 			if os.IsExist(err) {
-				fmt.Println("[i] Symlink aleardy exists , continue to the exploit")
+				fmt.Println("[i] Symlink already exists , continue to the exploit")
 				return ""
 			}
 

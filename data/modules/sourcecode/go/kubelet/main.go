@@ -567,7 +567,7 @@ func PrintDecodedToken(tokenString string) {
 	if !strings.HasSuffix(newDec, "}"){
 		newDec += "}"
 	}
-	
+
 	var jwtToken JWTToken
 	err := json.Unmarshal([]byte(newDec), &jwtToken)
 	if err != nil {

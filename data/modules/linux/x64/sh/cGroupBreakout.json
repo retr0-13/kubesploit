@@ -1,0 +1,30 @@
+{
+  "base": {
+    "name": "cGroupBreakout",
+    "type": "standard",
+    "author": ["Yaniv Yakobovich"],
+    "credits": ["Felix Wilhelm - https://blog.trailofbits.com/2019/07/19/understanding-docker-container-escapes/"],
+    "path": ["linux", "shell", "cGroupBreakout.json"],
+    "platform": "linux",
+    "arch": "x64",
+    "lang": "Shell",
+    "privilege": false,
+    "GoInterpreter": false,
+    "GoInterpreterProgress": false,
+    "LoadScriptFromPath": true,
+    "notes": "Commands are run with /bin/bash -c . Use quotes if you want to run multiple commands or shell features such as redirection or pipeline",
+    "remote": "",
+    "local": [],
+    "options": [
+      {"name": "cmd", "value": "cat /etc/shadow", "required": true, "flag": "", "description": "cmd which will be execute on the host"}
+    ],
+    "description": "Abusing the Linux cgroup v1 notification on release to run code on the host",
+    "commands": [
+      "data/modules/sourcecode/sh/cGroupBreakout/cGroupBreakout.sh",
+      "sh",
+      "-c",
+      "\"{{cmd}}\""
+    ]
+  }
+}
+

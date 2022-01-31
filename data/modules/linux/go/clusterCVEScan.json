@@ -19,7 +19,7 @@
     ],
     "description": "Scans Kubernetes cluster for known CVEs",
     "commands": [
-      "data/modules/go/scan/clusterCVEs/main.go",
+      "data/modules/sourcecode/go/scan/clusterCVEs/main.go",
       "mainfunc(\"{{url}}\")"
     ]
   }
