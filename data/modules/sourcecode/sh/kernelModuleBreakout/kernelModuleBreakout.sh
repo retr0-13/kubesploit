@@ -4,33 +4,37 @@ ip=$1
 port=$2
 
 exploitSysModule(){
+  RED=RED=$(tput bold)$(tput setaf 1)
+	DEFAULT_COLOR=$(tput sgr0)
+
   echo "[i] Exploiting SYS_MODULE"
   echo $ip
   echo $port
 
 
   if ! [ -x "$(command -v make)" ]; then
-    echo "[!] make is required to run this exploit."
+    echo "${RED}[i] ${DEFAULT_COLOR} make is required to run this exploit."
     exit 1
   fi
 
   if ! [ -x "$(command -v insmod)" ]; then
-    echo "[!] insmod is required to run this exploit."
+    echo "${RED}[i] ${DEFAULT_COLOR} insmod is required to run this exploit."
     exit 1
   fi
 
-  if ! [ -d "/lib/modules/$(uname -r)" ]; then
-    echo "[!] Linux headers for $(uname -r) are required to run this exploit."
+
+	if ! [ -d "/lib/modules/$(uname -r)" ]; then
+    echo "${RED}[i] ${DEFAULT_COLOR} The directory /lib/modules/$(uname -r) is required to run this exploit."
     exit 1
   fi
 
   if ! [ -d "$(readlink -f  /lib/modules/$(uname -r)/build)" ]; then
-    echo "$(readlink -f  /lib/modules/$(uname -r)/build) are required to run this exploit."
+    echo "${RED}[i] ${DEFAULT_COLOR}$(readlink -f  /lib/modules/$(uname -r)/build) are required to run this exploit."
     exit 1
   fi
 
   if ! [ -d "$(dirname $(readlink -f $(readlink -f  /lib/modules/$(uname -r)/build)/Makefile))" ]; then
-    echo "$(dirname $(readlink -f $(readlink -f  /lib/modules/$(uname -r)/build)/Makefile)) are required to run this exploit."
+    echo "${RED}[i] ${DEFAULT_COLOR}$(dirname $(readlink -f $(readlink -f  /lib/modules/$(uname -r)/build)/Makefile)) are required to run this exploit."
     exit 1
   fi
 
