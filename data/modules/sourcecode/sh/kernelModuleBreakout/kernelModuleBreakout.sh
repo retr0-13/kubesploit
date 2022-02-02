@@ -4,7 +4,7 @@ ip=$1
 port=$2
 
 exploitSysModule(){
-  RED=RED=$(tput bold)$(tput setaf 1)
+  RED=$(tput bold)$(tput setaf 1)
 	DEFAULT_COLOR=$(tput sgr0)
 
   echo "[i] Exploiting SYS_MODULE"
