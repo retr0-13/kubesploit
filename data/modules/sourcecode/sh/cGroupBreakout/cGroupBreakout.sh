@@ -1,7 +1,5 @@
 #!/bin/sh
 
-
-
 exploitCGroupBreakout() {
   cmd=$1
   echo "Exploiting cGroupEscape"
