@@ -19,7 +19,7 @@
       {"name": "ip", "value": "127.0.0.1", "required": true, "flag": "", "description": "ip for the reverse shell"},
       {"name": "port", "value": "8000", "required": true, "flag": "", "description": "port for the reverse shell"}
     ],
-    "description": "Abusing SYS_MODULE Capability to create reverse shell with the host",
+    "description": "Abusing SYS_MODULE Capability to create reverse shell with the host\nThere is couple of directories you need in order to use insmod and insert a module into the kernel,depend on your linux kernel version (check $(uname -r))\nFor exmaple, version 5.11.0-37 you will need the following directories:\n/usr/src/linux-headers-5.11.0-37-generic\n/usr/src/linux-hwe-5.11-headers-5.11.0-37\n/lib/modules/5.11.0-37-generic ",
     "commands": [
       "data/modules/sourcecode/sh/kernelModuleBreakout/kernelModuleBreakout.sh",
       "sh",
