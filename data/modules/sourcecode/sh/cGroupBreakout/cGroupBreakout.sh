@@ -1,8 +1,7 @@
 #!/bin/sh
 
-cmd=$1
-
 exploitCGroupBreakout() {
+  cmd=$1
   echo "Exploiting cGroupEscape"
   # POC modified from https://blog.trailofbits.com/2019/07/19/understanding-docker-container-escapes/
   # shellcheck disable=SC2012 # Not using find as it may not be available

