@@ -18,7 +18,7 @@
     "options": [
       {"name": "ip", "value": "127.0.0.1", "required": true, "flag": "", "description": "ip for the reverse shell"},
       {"name": "port", "value": "8000", "required": true, "flag": "", "description": "port for the reverse shell"},
-      {"name": "installRequiredFiles", "value": "false", "required": true, "flag": "", "description": "Install make and inosmod if they are not installed. Change to true to enable it."}
+      {"name": "installRequiredFiles", "value": "false", "required": true, "flag": "", "description": "Install make and insmod if they are not installed. Change to true to enable it."}
     ],
     "description": "Abusing SYS_MODULE Capability to create reverse shell with the host",
     "commands": [
