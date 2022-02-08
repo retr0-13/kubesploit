@@ -14,6 +14,9 @@ install_with_pkg()
 
     echo "[+] Installing insmod: $arg2 kmod."
     $arg2 kmod
+    
+    echo "[+] Installing GCC: $arg2 gcc."
+    $arg2 gcc
 }
 
 
