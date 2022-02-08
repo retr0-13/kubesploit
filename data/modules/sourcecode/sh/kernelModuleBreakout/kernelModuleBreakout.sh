@@ -3,16 +3,20 @@
 install_with_pkg()
 {
     arg1=$1
-    echo $arg1
+    arg2=$2
+    #echo $arg1
     
     echo "[+] Running update: $arg1 update."
-    $arg1 -y update
+    $arg1 update
 
-    echo "[+] Installing make: $arg1 install make."
-    $arg1 -y install make
+    echo "[+] Installing make: $arg2 make."
+    $arg2 make
 
-    echo "[+] Installing inosmod: $arg1 install kmod."
-    $arg1 -y install kmod
+    echo "[+] Installing insmod: $arg2 kmod."
+    $arg2 kmod
+    
+    echo "[+] Installing GCC: $arg2 gcc."
+    $arg2 gcc
 }
 
 
@@ -31,11 +35,11 @@ exploitSysModule(){
 
   if [ $installRequiredFiles = "true" ]; then
       if [ -x "$(command -v apt)" ]; then
-  	  install_with_pkg "apt"
+  	  install_with_pkg "apt" "apt install -y"
   	elif [ -x "$(command -v yum)" ]; then
-  	  install_with_pkg "yum"
+  	  install_with_pkg "yum" "yum install -y"
   	elif [ -x "$(command -v apk)" ]; then
-  	  install_with_pkg "apk"
+  	  install_with_pkg "apk" "apk add"
   	else
   	  echo "[!] Can't install files."
   	  exit 1
