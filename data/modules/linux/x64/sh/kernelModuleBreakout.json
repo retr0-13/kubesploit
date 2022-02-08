@@ -25,7 +25,7 @@
       "data/modules/sourcecode/sh/kernelModuleBreakout/kernelModuleBreakout.sh",
       "sh",
       "-c",
-      "\"{{ip}} {{port}} {{installRequiredFiles}}\""
+      "{{ip}} {{port}} {{installRequiredFiles}}"
     ]
   }
 }

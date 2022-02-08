@@ -23,7 +23,7 @@
       "data/modules/sourcecode/sh/cGroupBreakout/cGroupBreakout.sh",
       "sh",
       "-c",
-      "\"'{{cmd}}'\""
+      "\"{{cmd}}\""
     ]
   }
 }
