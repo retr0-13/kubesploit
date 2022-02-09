@@ -27,7 +27,6 @@ import (
 	"github.com/traefik/yaegi/stdlib/unrestricted"
 	"kubesploit/pkg/messages"
 	"runtime"
-        "strings"
 	"time"
 
 	// Standard
@@ -282,13 +281,17 @@ func ExecuteCommandScriptInCommands(name string, arg string) (stdout string, std
 	if errS != nil {
 		return "", fmt.Sprintf("There was an error parsing command line argments: %s\r\n%s", arg, errS.Error())
 	}
-	if len(argS) > 2 {
-                name = strings.TrimSuffix(name, "\n")
-		name += " " + argS[2]
-		cmd = exec.Command(argS[0],argS[1],name)
-		//cmd = exec.Command(argS[0],argS[1],name,"_", argS[2]) // #nosec G204
-	} else {
+	switch argSLen := len(argS);{
+	case argSLen > 2:
+		argS = append(argS,[]string{"",""}...)
+		copy(argS[4:],argS[2:])
+		argS[2]=name
+		argS[3]="_"
+		cmd = exec.Command(argS[0],argS[1:]...)
+	case argSLen == 2:
 		cmd = exec.Command(argS[0],argS[1],name) // #nosec G204
+	case argSLen < 2:
+		return "","Modules with source code must run with at lease 2 commands: sh -c"
 	}
 
 	out, err := cmd.CombinedOutput()
