@@ -288,7 +288,9 @@ func exportVersionFromKubernetesCluster(address string) Version {
 
 	resp, err := client.Get(address)
 	if err != nil {
-		log.Fatal("Failed with error: %s", err.Error())
+		//log.Fatal("Failed with error: %s", err.Error())
+		fmt.Println("Failed with error: %s", err.Error())
+		return Version{}
 	}
 
 	defer resp.Body.Close()
@@ -298,7 +300,9 @@ func exportVersionFromKubernetesCluster(address string) Version {
 	err = json.Unmarshal(body, &kubeVersion)
 
 	if err != nil {
-		log.Fatal("Failed to parse JSON error: %s", err.Error())
+		//log.Fatal("Failed to parse JSON error: %s", err.Error())
+		fmt.Println("Failed to parse JSON error: %s", err.Error())
+		return Version{}
 	}
 
 	/*
@@ -312,19 +316,25 @@ func exportVersionFromKubernetesCluster(address string) Version {
 	majorStr := strings.TrimPrefix(newVersion[0], "v")
 	majorInt, err := strconv.Atoi(majorStr)
 	if err != nil {
-		log.Fatal("Failed to parse major version with error: %s", err.Error())
+		//log.Fatal("Failed to parse major version with error: %s", err.Error())
+		fmt.Println("Failed to parse major version with error: %s", err.Error())
+		return Version{}
 	}
 
 	minorStr := strings.TrimSuffix(newVersion[1], "+")
 	minorInt, err := strconv.Atoi(minorStr)
 	if err != nil {
-		log.Fatal("Failed to parse minor version with error: %s", err.Error())
+		//log.Fatal("Failed to parse minor version with error: %s", err.Error())
+		fmt.Println("Failed to parse minor version with error: %s", err.Error())
+		return Version{}
 	}
 
 	patchSplitted := strings.Split(newVersion[2], "-")
 	patchInt, err := strconv.Atoi(patchSplitted[0])
 	if err != nil {
-		log.Fatal("Failed to parse patch version with error: %s", err.Error())
+		//log.Fatal("Failed to parse patch version with error: %s", err.Error())
+		fmt.Println("Failed to parse patch version with error: %s", err.Error())
+		return Version{}
 	}
 
 	return Version{
@@ -372,16 +382,18 @@ func mainfunc(urlInput string) {
 
 	fmt.Printf("[*] Scanning Kubernetes cluster: %s\n", urlInput)
 	currentVersion := exportVersionFromKubernetesCluster(urlInput)
+    if (Version{}) != currentVersion {
+		fmt.Printf("[*] Current cluster version: %s\n\n", currentVersion.Raw)
+		/*
+			currentVersion = Version{
+				Major: 1,
+				Minor: 11,
+				Patch: 3,
+			}
+		*/
 
-	fmt.Printf("[*] Current cluster version: %s\n\n", currentVersion.Raw)
-	/*
-		currentVersion = Version{
-			Major: 1,
-			Minor: 11,
-			Patch: 3,
-		}
-	*/
+		checkForVulnerabilitiesBaseOnVersion(currentVersion)
+	}
 
-	checkForVulnerabilitiesBaseOnVersion(currentVersion)
 	fmt.Println("[*] Done")
 }
